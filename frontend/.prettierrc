@@ -1,0 +1,25 @@
+{
+  "tabWidth": 2,
+  "printWidth": 111,
+  "bracketSpacing": true,
+  "endOfLine": "auto",
+  "arrowParens": "always",
+  "embeddedLanguageFormatting": "auto",
+  "bracketSameLine": true,
+  "jsxSingleQuote": false,
+  "trailingComma": "es5",
+  "singleQuote": true,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "eslint.alwaysShowStatus": true,
+  "eslint.format.enable": true,
+  "eslint.packageManager": "pnpm",
+  "eslint.run": "onSave",
+  "eslint.workingDirectories": ["./"],
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "editor.codeActionsOnSaveTimeout": 1500,
+  "editor.formatOnSaveTimeout": 1500
+}
