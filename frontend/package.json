@@ -11,8 +11,9 @@
     "lint": "eslint . --ext js,ts,tsx",
     "format": "prettier --write **/*.{js,ts,tsx} && eslint . --ext js,ts,tsx --fix",
     "preview": "vite preview",
-    "postinstall": "bash postinstall.sh",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "docker:build": "docker build -f Dockerfile -t app .",
+    "docker:run": "docker run -it -p 80:80 app"
   },
   "dependencies": {
     "@emotion/babel-plugin": "^11.11.0",
