@@ -1,36 +1,36 @@
-version: '3.8'
+version: '3.9'
 
 services:
-  mysqldb:
-    image: mysql
+
+  db:
+    image: mysql:8.0
+    restart: always
+    env_file: .env
     ports:
-      - '3306:3306'
-    volumes:
-      - db:/var/lib/mysql
-    networks:
-      - app-network
+      - $MYSQLDB_LOCAL_PORT:$MYSQLDB_DOCKER_PORT
+    environment:
+      - MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE=$MYSQL_DATABASE
 
   backend:
+    restart: always
+    env_file: .env
     depends_on:
-      - mysqldb
+      - db
     build:
       context: ./backend
-      dockerfile: Dockerfile
     ports:
-      - '8888:8888'
+      - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
+    volumes:
+      - .:/app
     environment:
-      - DB_HOST=mysqldb
-      - DB_USER=$MYSQLDB_USER
-      - DB_PASSWORD=$MYSQLDB_ROOT_PASSWORD
-      - DB_NAME=$MYSQLDB_DATABASE
-      - DB_PORT=$MYSQLDB_DOCKER_PORT
       - CLIENT_ORIGIN=$CLIENT_ORIGIN
-    networks:
-      - app-network
+      - DATABASE_URL=$DATABASE_URL
 
   frontend:
-    depends_on:
-      - backend
+    image: vite_app
+    restart: always
+    env_file: .env
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -38,12 +38,4 @@ services:
         - REACT_APP_API_BASE_URL=$CLIENT_API_BASE_URL
     ports:
       - $REACT_LOCAL_PORT:$REACT_DOCKER_PORT
-    networks:
-      - app-network
 
-volumes:
-  db:
-
-networks:
-  app-network:
-    driver: bridge

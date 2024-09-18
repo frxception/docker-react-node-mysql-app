@@ -18,4 +18,18 @@ dist-ssr
 *.local
 
 .env
-docs
+*docs
+
+
+backend/node_modules
+frontend/node_modules
+
+backend/dist
+frontend/dist
+
+backend/.vscode
+frontend/.vscode
+frontend/docs
+
+backend/.idea
+frontend/.idea
