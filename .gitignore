@@ -33,6 +33,9 @@ frontend/docs
 backend/.idea
 frontend/.idea
 
+backend/.git
+frontend/.git
+
 backend/dbdata
 
 # TODO: For demo purposes we allow .env to be pushed
