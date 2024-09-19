@@ -20,7 +20,11 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "docker:build": "docker build -f Dockerfile -t app .",
     "docker:run": "docker run -it -p 80:80 app",
-    "docker:prune": "docker system prune -a"
+    "docker:prune": "docker system prune -a",
+    "seed": "npx prisma db seed"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",

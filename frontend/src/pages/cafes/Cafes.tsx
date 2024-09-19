@@ -4,8 +4,11 @@ import {
   useDeleteCafeMutation,
   useCafeListQuery,
   useUpdateCafeMutation,
+  CafeDataType,
+  ResponseDataType as CafeResponseDataType,
 } from '@/api/services/cafes';
-import { EmployeeDataType, ResponseDataType } from '@/api/services/employees';
+import { Order } from '@/helpers/types/ui.types.ts';
+import { getFormattedDateTime } from '@/helpers/utils';
 import { useModalStore } from '@/hooks';
 import AddIcon from '@mui/icons-material/Add';
 import {
@@ -23,8 +26,10 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Avatar,
+  TableSortLabel,
 } from '@mui/material';
-import { omit } from 'lodash';
+import { omit, sortBy } from 'lodash';
 import React, { useMemo, useState } from 'react';
 import { FiTrash2, FiEdit } from 'react-icons/fi';
 import CafeModal from './CafeModal';
@@ -45,22 +50,17 @@ const Cafes = () => {
     undefined
   );
 
+  const [order, setOrder] = useState<Order>('asc');
+  const [orderBy, setOrderBy] = useState<keyof CafeDataType>('name');
+
   const dataQueryList = useMemo(() => {
     if (queryData) {
-      return (queryData as unknown as ResponseDataType['data'])?.sort((a, b) => {
-        if (a.name && !b.name) {
-          return 1;
-        } else if (!a.name && b.name) {
-          return -1;
-        } else {
-          return 0;
-        }
-      });
+      return sortBy(queryData as unknown as CafeResponseDataType['data'], ['name']);
     }
   }, [queryData]);
 
   const existingCafeNames = useMemo(() => {
-    return dataQueryList ? dataQueryList.map((cafe: EmployeeDataType) => cafe.name) : [];
+    return dataQueryList ? dataQueryList.map((cafe: CafeDataType) => cafe.name) : [];
   }, [dataQueryList]);
 
   const handleCreateCafe = (body: CafeDataMutationType) => {
@@ -85,6 +85,20 @@ const Cafes = () => {
     );
   };
 
+  const handleDeleteCafe = (id: string) => {
+    return deleteCafe(id, {
+      onSuccess: () => {
+        void refetch();
+      },
+    });
+  };
+
+  const handleDelete = (cafe: CafeDataType) => {
+    if (window.confirm(`Are you sure you want to delete "${cafe.name}"?`)) {
+      handleDeleteCafe(cafe.id as string);
+    }
+  };
+
   const handleSubmit = (data: CafeDataMutationType, id?: string) => {
     if (modalMode === 'add') {
       handleCreateCafe(data);
@@ -99,34 +113,44 @@ const Cafes = () => {
     open();
   };
 
-  const handleOpenEditModal = (cafe: EmployeeDataType) => {
+  const handleOpenEditModal = (cafe: CafeDataType) => {
     setModalMode('edit');
     setSelectedCafe(cafe as CafeDataMutationType & { id?: string });
     open();
   };
 
-  const handleDeleteCafe = (id: string) => {
-    return deleteCafe(id, {
-      onSuccess: () => {
-        void refetch();
-      },
-    });
+  const handleRequestSort = (property: keyof CafeDataType) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
   };
 
-  // const handleEdit = (cafe: EmployeeDataType) => {
-  //   if (window.confirm(`Are you sure you want to edit "${cafe.name}"?`)) {
-  //     const newName = prompt('Enter new cafe name', cafe.name);
-  //     if (newName && newName !== cafe.name) {
-  //       handleUpdateCafe({ name: newName }, cafe.id as string);
-  //     }
-  //   }
-  // };
-
-  const handleDelete = (cafe: EmployeeDataType) => {
-    if (window.confirm(`Are you sure you want to delete "${cafe.name}"?`)) {
-      handleDeleteCafe(cafe.id as string);
+  const sortedData = useMemo(() => {
+    if (dataQueryList) {
+      return [...dataQueryList].sort((a, b) => {
+        if (orderBy === 'name' || orderBy === 'location' || orderBy === 'description') {
+          const aValue = a[orderBy]?.toLowerCase() || '';
+          const bValue = b[orderBy]?.toLowerCase() || '';
+          if (order === 'asc') {
+            return aValue.localeCompare(bValue);
+          } else {
+            return bValue.localeCompare(aValue);
+          }
+        }
+        if (orderBy === 'updatedAt') {
+          const aValue = new Date(a[orderBy] || 0).getTime();
+          const bValue = new Date(b[orderBy] || 0).getTime();
+          if (order === 'asc') {
+            return aValue - bValue;
+          } else {
+            return bValue - aValue;
+          }
+        }
+        return 0;
+      });
     }
-  };
+    return [];
+  }, [dataQueryList, order, orderBy]);
 
   return (
     <React.Fragment>
@@ -166,36 +190,69 @@ const Cafes = () => {
               <Typography className="text-black">No data</Typography>
             </div>
           )}
-          {dataQueryList && (
+          {sortedData && (
             <TableContainer component={Paper}>
               <Table sx={{ minWidth: 650 }} aria-label="cafe table">
                 <TableHead>
                   <TableRow>
                     <TableCell>ID</TableCell>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Description</TableCell>
+                    <TableCell>
+                      <TableSortLabel
+                        active={orderBy === 'name'}
+                        direction={orderBy === 'name' ? order : 'asc'}
+                        onClick={() => handleRequestSort('name')}>
+                        Name
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell>
+                      <TableSortLabel
+                        active={orderBy === 'description'}
+                        direction={orderBy === 'description' ? order : 'asc'}
+                        onClick={() => handleRequestSort('description')}>
+                        Description
+                      </TableSortLabel>
+                    </TableCell>
                     <TableCell>Employees</TableCell>
-                    <TableCell>Location</TableCell>
+                    <TableCell>
+                      <TableSortLabel
+                        active={orderBy === 'location'}
+                        direction={orderBy === 'location' ? order : 'asc'}
+                        onClick={() => handleRequestSort('location')}>
+                        Location
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell>
+                      <TableSortLabel
+                        active={orderBy === 'updatedAt'}
+                        direction={orderBy === 'updatedAt' ? order : 'asc'}
+                        onClick={() => handleRequestSort('updatedAt')}>
+                        Update
+                      </TableSortLabel>
+                    </TableCell>
                     <TableCell>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {dataQueryList.map((data: EmployeeDataType) => (
+                  {sortedData.map((data) => (
                     <TableRow key={data?.id}>
                       <TableCell component="th" scope="row">
                         {data?.id}
                       </TableCell>
                       <TableCell component="th" scope="row">
+                        <Avatar src={data.logo} />
                         {data?.name}
                       </TableCell>
                       <TableCell component="th" scope="row">
                         {data?.description}
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {data?.employees}
+                        {data?.employees.map((o) => <ol key={o.id}>{`- ${o.name}`}</ol>)}
                       </TableCell>
                       <TableCell component="th" scope="row">
                         {data?.location}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {getFormattedDateTime(data?.updatedAt)}
                       </TableCell>
                       <TableCell align="left">
                         <IconButton onClick={() => handleOpenEditModal(data)}>

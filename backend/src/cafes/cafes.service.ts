@@ -11,13 +11,20 @@ export class CafesService {
   }
 
   async findAll() {
-    return this.databaseService.cafes.findMany({});
+    return this.databaseService.cafes.findMany({
+      include: {
+        employees: true,
+      },
+    });
   }
 
   async findOne(id: number) {
     return this.databaseService.cafes.findUnique({
       where: {
         id,
+      },
+      include: {
+        employees: true,
       },
     });
   }

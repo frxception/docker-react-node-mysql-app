@@ -1,83 +1,108 @@
-import React, { FC, useMemo } from 'react';
+import { Order } from '@/helpers/types/ui.types.ts';
+import { getFormattedDateTime } from '@/helpers/utils';
+import { omit } from 'lodash';
+import React, { FC, useMemo, useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import { FiTrash2 } from 'react-icons/fi';
+import { FiEdit, FiTrash2 } from 'react-icons/fi';
 import {
+  Avatar,
   Backdrop,
-  Box,
-  Button,
   Card,
   CardContent,
   CardHeader,
   CircularProgress,
-  FormControl,
-  FormHelperText,
   IconButton,
-  Modal,
-  TextField,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Typography,
+  TableSortLabel,
 } from '@mui/material';
 import { useModalStore } from '@/hooks';
-import { Controller, useForm } from 'react-hook-form';
 import {
   EmployeeDataMutationType,
+  EmployeeDataType,
+  ResponseDataType,
   useAddEmployeeMutation,
   useDeleteEmployeeMutation,
   useEmployeeListQuery,
   useUpdateEmployeeMutation,
 } from '@/api/services/employees';
-
-type Input = {
-  employeeName: string;
-};
+import EmployeeModal, { EmployeeModalProps } from './EmployeeModal';
+import { useCafeListQuery } from '@/api/services';
 
 const Employees: FC = () => {
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<Input>();
-
   const isOpen = useModalStore((state) => state.isOpen);
   const open = useModalStore((state) => state.open);
   const close = useModalStore((state) => state.close);
 
   const { data: queryData, isLoading: loadingFetch, refetch } = useEmployeeListQuery();
-
+  const { data: cafes } = useCafeListQuery();
   const { mutate: addEmployee, isLoading: loadingCreate } = useAddEmployeeMutation();
   const { mutate: updateEmployee, isLoading: loadingUpdate } = useUpdateEmployeeMutation();
   const { mutate: deleteEmployee, isLoading: loadingDelete } = useDeleteEmployeeMutation();
 
-  const dataQueryList = useMemo(() => {
-    if (queryData && queryData.data) {
-      return queryData?.data.sort((a, b) => {
-        if (a.name && !b.name) {
-          return 1;
-        } else if (!a.name && b.name) {
-          return -1;
-        } else {
-          return 0;
+  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
+  const [selectedEmployee, setSelectedEmployee] = useState<
+    (EmployeeDataMutationType & { id?: string }) | undefined
+  >(undefined);
+
+  const [order, setOrder] = useState<Order>('asc');
+  const [orderBy, setOrderBy] = useState<keyof EmployeeDataType>('name');
+
+  const handleRequestSort = (property: keyof EmployeeDataType) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
+
+  const sortedData = useMemo(() => {
+    if (queryData) {
+      return [...(queryData as unknown as ResponseDataType['data'])].sort((a, b) => {
+        if (orderBy === 'name') {
+          return order === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
         }
+        if (orderBy === 'days') {
+          return order === 'asc' ? a.days - b.days : b.days - a.days;
+        }
+        if (orderBy === 'createdAt') {
+          return order === 'asc'
+            ? new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        }
+        if (orderBy === 'gender') {
+          return order === 'asc' ? a.name.localeCompare(b.gender) : b.name.localeCompare(a.gender);
+        }
+        return 0;
       });
     }
-  }, [queryData]);
+    return [];
+  }, [queryData, order, orderBy]);
 
   const handleCreateEmployee = (body: EmployeeDataMutationType) => {
     return addEmployee(body, {
       onSuccess: () => {
         void refetch();
-        void reset({ employeeName: '' });
         void close();
       },
     });
   };
 
-  const handleUpdateEmployee = (body: { id: string; data: EmployeeDataMutationType }) => {
-    return updateEmployee(body, {
-      onSuccess: () => {
-        void refetch();
-      },
-    });
+  const handleUpdateEmployee = (body: EmployeeDataMutationType, id: string) => {
+    if (!id) return;
+    return updateEmployee(
+      { id, data: omit(body, 'id') },
+      {
+        onSuccess: () => {
+          void refetch();
+          void close();
+        },
+      }
+    );
   };
 
   const handleDeleteEmployee = (id: string) => {
@@ -88,6 +113,32 @@ const Employees: FC = () => {
     });
   };
 
+  const handleDelete = (e: EmployeeDataType) => {
+    if (window.confirm(`Are you sure you want to delete "${e.name}"?`)) {
+      handleDeleteEmployee(e.id as string);
+    }
+  };
+
+  const handleSubmit = (data: EmployeeDataMutationType, id: string) => {
+    if (modalMode === 'add') {
+      handleCreateEmployee(data);
+    } else {
+      handleUpdateEmployee(data, id);
+    }
+  };
+
+  const handleOpenAddModal = () => {
+    setModalMode('add');
+    setSelectedEmployee(undefined);
+    open();
+  };
+
+  const handleOpenEditModal = (cafe: EmployeeDataMutationType) => {
+    setModalMode('edit');
+    setSelectedEmployee(cafe as EmployeeDataMutationType & { id?: string });
+    open();
+  };
+
   return (
     <React.Fragment>
       <Backdrop
@@ -95,49 +146,22 @@ const Employees: FC = () => {
         open={loadingDelete || loadingUpdate}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      <Modal
-        open={isOpen}
+
+      <EmployeeModal
+        isOpen={isOpen}
         onClose={close}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-        className="flex justify-center items-center">
-        <>
-          <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={loadingCreate}>
-            <CircularProgress color="inherit" />
-          </Backdrop>
-          <Box
-            component="form"
-            className="w-3/5 py-10 px-5 bg-white dark:bg-slate-700 rounded-xl"
-            onSubmit={handleSubmit(handleCreateEmployee as any)}>
-            <Controller
-              rules={{ required: true }}
-              control={control}
-              render={({ field }) => (
-                <FormControl fullWidth>
-                  <TextField
-                    {...field}
-                    error={errors.employeeName ? true : false}
-                    name="employeeName"
-                    label="Employee Name"
-                  />
-                  {errors.employeeName && <FormHelperText error>{errors.employeeName.message}</FormHelperText>}
-                </FormControl>
-              )}
-              name="employeeName"
-            />
-            <div className="mt-5 flex justify-end">
-              <Button type="submit" size="small" variant="contained">
-                Submit
-              </Button>
-            </div>
-          </Box>
-        </>
-      </Modal>
+        onSubmit={handleSubmit as any}
+        loading={loadingCreate || loadingUpdate}
+        mode={modalMode}
+        initialData={selectedEmployee as EmployeeModalProps['initialData']}
+        cafes={cafes as unknown as EmployeeModalProps['cafes']}
+      />
+
       <Card>
         <CardHeader
           title="Employee"
           action={
-            <IconButton onClick={open}>
+            <IconButton onClick={handleOpenAddModal}>
               <AddIcon />
             </IconButton>
           }
@@ -148,20 +172,97 @@ const Employees: FC = () => {
               <CircularProgress />
             </div>
           )}
-          {!loadingFetch && !dataQueryList && (
+          {!loadingFetch && !sortedData && (
             <div className="flex justify-center">
               <Typography className="text-black">No data</Typography>
             </div>
           )}
-          {dataQueryList &&
-            dataQueryList.map((data) => (
-              <div key={data?.id} className="flex justify-between items-center">
-                <div>{data?.name}</div>
-                <IconButton onClick={() => handleDeleteEmployee(data?.id as string)}>
-                  <FiTrash2 />
-                </IconButton>
-              </div>
-            ))}
+          {sortedData && (
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 650 }} aria-label="employee table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>ID</TableCell>
+                    <TableCell>
+                      <TableSortLabel
+                        active={orderBy === 'name'}
+                        direction={orderBy === 'name' ? order : 'asc'}
+                        onClick={() => handleRequestSort('name')}>
+                        Name
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell>
+                      <TableSortLabel
+                        active={orderBy === 'gender'}
+                        direction={orderBy === 'gender' ? order : 'asc'}
+                        onClick={() => handleRequestSort('gender')}>
+                        Gender
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell>Email</TableCell>
+                    <TableCell>Phone</TableCell>
+                    <TableCell>
+                      <TableSortLabel
+                        active={orderBy === 'days'}
+                        direction={orderBy === 'days' ? order : 'asc'}
+                        onClick={() => handleRequestSort('days')}>
+                        Days
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell>
+                      <TableSortLabel
+                        active={orderBy === 'createdAt'}
+                        direction={orderBy === 'createdAt' ? order : 'asc'}
+                        onClick={() => handleRequestSort('createdAt')}>
+                        Added
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell>Cafe</TableCell>
+                    <TableCell>Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {sortedData.map((data) => (
+                    <TableRow key={data?.id}>
+                      <TableCell component="th" scope="row">
+                        {data?.id}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {data?.name}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {data?.gender?.toUpperCase() === 'M' ? 'Male' : 'Female'}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {data?.email}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {data?.phone}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {data?.days}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {getFormattedDateTime(data?.createdAt)}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        <Avatar src={data?.cafe?.logo} />
+                        {data?.cafe?.name}
+                      </TableCell>
+                      <TableCell align="left">
+                        <IconButton onClick={() => handleOpenEditModal(data)}>
+                          <FiEdit />
+                        </IconButton>
+                        <IconButton onClick={() => handleDelete(data)}>
+                          <FiTrash2 />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
         </CardContent>
       </Card>
     </React.Fragment>

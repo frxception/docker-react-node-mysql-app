@@ -18,3 +18,5 @@ type RouteChildType = {
 export type RoutesType = RouteChildType & {
   children?: RouteChildType[];
 };
+
+export type Order = 'asc' | 'desc';

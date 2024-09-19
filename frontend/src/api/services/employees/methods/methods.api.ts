@@ -1,16 +1,26 @@
 import axiosClient from '@/api/clients/axios-client.ts';
-import { ResponseDataType, CafeDataType, CafeDataMutationType } from '@/api/services';
+import { ResponseDataType } from '@/api/services';
+import { EmployeeDataType, EmployeeDataMutationType } from '@/api/services/employees';
+import { omit } from 'lodash';
 
-const baseUrl = 'cafes';
+const baseUrl = 'Employees';
 
 const methodsApi = {
   getList: (): Promise<ResponseDataType> => axiosClient.get(baseUrl),
-  getDetail: (id: string): Promise<{ code: number; data: CafeDataType }> =>
+
+  getDetail: (id: string): Promise<{ code: number; data: EmployeeDataType }> =>
     axiosClient.get(`${baseUrl}/${id}`),
-  add: (body: CafeDataMutationType): Promise<{ code: number; data: CafeDataType }> =>
+
+  add: (body: EmployeeDataMutationType): Promise<{ code: number; data: EmployeeDataType }> =>
     axiosClient.post(baseUrl, body),
-  update: (body: { id: string; data: CafeDataMutationType }): Promise<{ code: number; data: CafeDataType }> =>
-    axiosClient.put(baseUrl + `/${body.id}`, body.data),
+
+  update: (body: {
+    id: string;
+    data: EmployeeDataMutationType;
+  }): Promise<{ code: number; data: EmployeeDataType }> =>
+    axiosClient.patch(baseUrl + `/${body.id}`, {
+      ...omit(body?.data, ['cafe', 'id', 'updatedAt', 'createdAt']),
+    }),
   delete: (id: string): Promise<{ code: number; message: string }> => axiosClient.delete(baseUrl + `/${id}`),
 };
 

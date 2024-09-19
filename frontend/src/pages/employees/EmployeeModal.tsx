@@ -15,34 +15,42 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Select,
+  MenuItem,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormLabel,
 } from '@mui/material';
-import { CafeDataMutationType } from '@/api/services/cafes';
+import { EmployeeDataMutationType } from '@/api/services/employees';
 
 type Input = {
   name: string;
-  description: string;
-  logo: string;
-  location: string;
+  phone: string;
+  email: string;
+  days: string;
+  cafesId: string;
+  gender: string;
 };
 
-type CafeModalProps = {
+export type EmployeeModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: CafeDataMutationType, id?: string) => void;
+  onSubmit: (data: EmployeeDataMutationType, id?: string) => void;
   loading: boolean;
-  existingCafeNames: string[];
   mode: 'add' | 'edit';
-  initialData?: CafeDataMutationType & { id?: string };
+  initialData?: EmployeeDataMutationType & { id?: number };
+  cafes: { id: string; name: string }[];
 };
 
-const CafeModal: React.FC<CafeModalProps> = ({
+const EmployeeModal: React.FC<EmployeeModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
   loading,
-  existingCafeNames,
   mode,
   initialData,
+  cafes,
 }) => {
   const {
     control,
@@ -57,9 +65,9 @@ const CafeModal: React.FC<CafeModalProps> = ({
     if (initialData && mode === 'edit') {
       reset({
         ...initialData,
-      });
+      } as any);
     } else {
-      reset({}); // Initialize with an empty array
+      reset({ gender: 'M' }); // Initialize with default gender 'M'
     }
   }, [initialData, mode, reset]);
 
@@ -81,21 +89,12 @@ const CafeModal: React.FC<CafeModalProps> = ({
     setConfirmOpen(false);
   };
 
-  const validateUniqueName = (value: string) => {
-    if (mode === 'add' && existingCafeNames.includes(value)) {
-      return 'A cafe with this name already exists';
-    }
-    if (mode === 'edit' && value !== initialData?.name && existingCafeNames.includes(value)) {
-      return 'A cafe with this name already exists';
-    }
-    return true;
-  };
-
   const onFormSubmit = (data: Input) => {
     onSubmit(
       {
         ...data,
-      } as unknown as CafeDataMutationType,
+        days: parseInt(data?.days),
+      } as EmployeeDataMutationType,
       initialData?.id
     );
   };
@@ -106,7 +105,7 @@ const CafeModal: React.FC<CafeModalProps> = ({
         open={isOpen}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+        aria-describedby="modal-modal-phone"
         className="flex justify-center items-center">
         <>
           <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={loading}>
@@ -117,15 +116,14 @@ const CafeModal: React.FC<CafeModalProps> = ({
             className="w-3/5 py-10 px-5 bg-white dark:bg-slate-700 rounded-xl"
             onSubmit={handleSubmit(onFormSubmit)}>
             <Typography variant="h5" className="mb-15 pb-6">
-              {mode === 'add' ? 'Add Cafe' : 'Edit Cafe'}
+              {mode === 'add' ? 'Add Employee' : 'Edit Employee'}
             </Typography>
 
             <div className="flex flex-col gap-5">
               <Controller
                 rules={{
-                  required: 'Cafe name is required',
-                  maxLength: { value: 6, message: 'Cafe name must be 6 characters or less' },
-                  validate: validateUniqueName,
+                  required: 'Employee name is required',
+                  maxLength: { value: 50, message: 'Employee name must be 50 characters or less' },
                 }}
                 control={control}
                 render={({ field }) => (
@@ -134,15 +132,29 @@ const CafeModal: React.FC<CafeModalProps> = ({
                       {...field}
                       error={!!errors.name}
                       name="name"
-                      label="Cafe Name"
-                      inputProps={{ maxLength: 6 }}
+                      label="Employee Name"
+                      inputProps={{ maxLength: 50 }}
                     />
                     {errors.name && <FormHelperText error>{errors.name.message}</FormHelperText>}
                   </FormControl>
                 )}
                 name="name"
               />
-
+              <Controller
+                rules={{ required: 'Gender is required' }}
+                control={control}
+                render={({ field }) => (
+                  <FormControl component="fieldset" error={!!errors.gender}>
+                    <FormLabel component="legend">Gender</FormLabel>
+                    <RadioGroup row {...field}>
+                      <FormControlLabel value="M" control={<Radio />} label="Male" />
+                      <FormControlLabel value="F" control={<Radio />} label="Female" />
+                    </RadioGroup>
+                    {errors.gender && <FormHelperText>{errors.gender.message}</FormHelperText>}
+                  </FormControl>
+                )}
+                name="gender"
+              />
               <Controller
                 rules={{ required: true }}
                 control={control}
@@ -150,15 +162,16 @@ const CafeModal: React.FC<CafeModalProps> = ({
                   <FormControl fullWidth>
                     <TextField
                       {...field}
-                      error={errors.description ? true : false}
-                      name="description"
-                      label="Description"
-                      inputProps={{ maxLength: 256 }}
+                      error={errors.phone ? true : false}
+                      name="phone"
+                      label="Mobile"
+                      type="tel"
+                      inputProps={{ maxLength: 15 }}
                     />
-                    {errors.description && <FormHelperText error>{errors.description.message}</FormHelperText>}
+                    {errors.phone && <FormHelperText error>{errors.phone.message}</FormHelperText>}
                   </FormControl>
                 )}
-                name="description"
+                name="phone"
               />
 
               <Controller
@@ -168,14 +181,15 @@ const CafeModal: React.FC<CafeModalProps> = ({
                   <FormControl fullWidth>
                     <TextField
                       {...field}
-                      error={errors.location ? true : false}
-                      name="location"
-                      label="Location"
+                      error={errors.email ? true : false}
+                      name="email"
+                      label="Email"
+                      type="email"
                     />
-                    {errors.location && <FormHelperText error>{errors.location.message}</FormHelperText>}
+                    {errors.email && <FormHelperText error>{errors.email.message}</FormHelperText>}
                   </FormControl>
                 )}
-                name="location"
+                name="email"
               />
 
               <Controller
@@ -183,11 +197,44 @@ const CafeModal: React.FC<CafeModalProps> = ({
                 control={control}
                 render={({ field }) => (
                   <FormControl fullWidth>
-                    <TextField {...field} error={errors.logo ? true : false} name="logo" label="Logo" />
-                    {errors.logo && <FormHelperText error>{errors.logo.message}</FormHelperText>}
+                    <TextField
+                      {...field}
+                      type="number"
+                      error={errors.days ? true : false}
+                      name="days"
+                      label="Days"
+                    />
+                    {errors.days && <FormHelperText error>{errors.days.message}</FormHelperText>}
                   </FormControl>
                 )}
-                name="logo"
+                name="days"
+              />
+
+              <Controller
+                rules={{ required: 'Cafe is required' }}
+                control={control}
+                render={({ field }) => (
+                  <FormControl fullWidth error={!!errors.cafesId}>
+                    <Select
+                      {...field}
+                      displayEmpty
+                      labelId="cafe-select-label"
+                      id="cafe-select"
+                      label="SelectCafe"
+                      placeholder="Select a Cafe">
+                      <MenuItem value="" disabled>
+                        <em>Select a Cafe</em>
+                      </MenuItem>
+                      {cafes?.map((cafe) => (
+                        <MenuItem key={cafe?.id} value={cafe?.id}>
+                          {cafe?.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {errors.cafesId && <FormHelperText>{errors.cafesId.message}</FormHelperText>}
+                  </FormControl>
+                )}
+                name="cafesId"
               />
             </div>
 
@@ -204,10 +251,10 @@ const CafeModal: React.FC<CafeModalProps> = ({
         open={confirmOpen}
         onClose={handleCancelClose}
         aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description">
+        aria-describedby="alert-dialog-phone">
         <DialogTitle id="alert-dialog-title">{'Confirm Exit'}</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
+          <DialogContentText id="alert-dialog-phone">
             Are you sure you want to leave without {mode === 'add' ? 'submitting' : 'updating'} this entry?
           </DialogContentText>
         </DialogContent>
@@ -222,4 +269,4 @@ const CafeModal: React.FC<CafeModalProps> = ({
   );
 };
 
-export default CafeModal;
+export default EmployeeModal;

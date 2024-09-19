@@ -9,19 +9,25 @@ datasource db {
 }
 
 model Cafes {
-  id          Int    @id @default(autoincrement())
-  name        String @unique
+  id          Int         @id @default(autoincrement())
+  name        String      @unique
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   description String
   logo        String
   location    String
-  employees   Int
+  employees   Employees[]
 }
 
 model Employees {
-  id            Int    @id @default(autoincrement())
-  name          String
-  email_address String
-  phone_number  String
-  days_worked   Int
-  cafe          String @unique
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  cafesId   Int
+  days      Int
+  email     String
+  phone     String
+  gender    String
+  cafe      Cafes    @relation(fields: [cafesId], references: [id])
 }

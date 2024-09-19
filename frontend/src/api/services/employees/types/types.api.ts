@@ -1,11 +1,18 @@
+import { CafeDataType } from '@/api/services';
+
 export type EmployeeDataType = {
-  _id: string;
+  // _id?: string;
   id?: string;
+  createdAt: string;
+  updatedAt: string;
   name: string;
   description: string;
-  employees: string;
-  logo: string;
-  location: string;
+  gender: string;
+  email: string;
+  phone: string;
+  days: number;
+  cafe?: CafeDataType;
+  cafesId: string;
 };
 
 export type ResponseDataType = {

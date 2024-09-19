@@ -1,5 +1,5 @@
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+# Backend 
 
 ## Installation
 
@@ -39,12 +39,61 @@ Use Prisma CLI to apply migrations and generate the Prisma client:
 ```bash
 npx prisma migrate dev
 npx prisma generate
-
 ```
+
+### Seed the Cafes and Employees (add dummy data)
+
+
+While the docker container/db server is running run the following:
+```bash
+npx prisma db seed
+
+or 
+
+pnpm run seed
+```
+
+Then just to be sure run again...
+
+```prisma
+npx prisma migrate dev
+```
+
+Afterwards, seed data is in db already.
+
 
 ## API
 
-Default service api url
+
+
+### Schema (Entity Relationship)
+```prisma
+model Cafes {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  description String
+  logo        String
+  location    String
+  employees   Employees[]
+}
+
+model Employees {
+  id            Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  name          String
+  email_address String
+  phone_number  String
+  days_worked   Int
+  cafe          Cafes    @relation(fields: [cafesId], references: [id])
+  cafesId       Int
+}
+
+```
+
+### Default service api url
 http://location:8888
 
 > CRUD Operations:
