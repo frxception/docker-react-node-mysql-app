@@ -1,17 +1,44 @@
-import { Suspense } from 'react';
+import { Router, Route, RootRoute } from '@tanstack/react-router';
+import LayoutComponent from '@/layouts';
+import Cafes from '@/pages/cafes/Cafes';
+import Employees from '@/pages/employees/Employees';
+import NotFound from '@/pages/not-found/NotFound';
+import { HOME_PATH, EMPLOYEES_PATH } from '@/configs';
 
-import { BrowserRouter } from 'react-router-dom';
+const rootRoute = new RootRoute({
+  component: LayoutComponent,
+});
 
-import Router from './Router.tsx';
+const indexRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: '/',
+  component: Cafes,
+});
 
-const Routes = () => {
-  return (
-    <Suspense fallback="loading...">
-      <BrowserRouter>
-        <Router />
-      </BrowserRouter>
-    </Suspense>
-  );
-};
+const cafesRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: HOME_PATH,
+  component: Cafes,
+});
 
-export default Routes;
+const employeesRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: EMPLOYEES_PATH,
+  component: Employees,
+});
+
+const notFoundRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: '*',
+  component: NotFound,
+});
+
+const routeTree = rootRoute.addChildren([indexRoute, cafesRoute, employeesRoute, notFoundRoute]);
+
+export const router = new Router({ routeTree });
+
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router;
+  }
+}

@@ -1,12 +1,13 @@
 import { Order } from '@/helpers/types/ui.types.ts';
 import { getFormattedDateTime } from '@/helpers/utils';
 import { omit } from 'lodash';
-import React, { FC, useMemo, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import { FiEdit, FiTrash2 } from 'react-icons/fi';
 import {
   Avatar,
   Backdrop,
+  Box, // Add this line
   Card,
   CardContent,
   CardHeader,
@@ -140,7 +141,13 @@ const Employees: FC = () => {
   };
 
   return (
-    <React.Fragment>
+    <Box
+      sx={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+      }}>
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={loadingDelete || loadingUpdate}>
@@ -157,7 +164,13 @@ const Employees: FC = () => {
         cafes={cafes as unknown as EmployeeModalProps['cafes']}
       />
 
-      <Card>
+      <Card
+        sx={{
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+        }}>
         <CardHeader
           title="Employee"
           action={
@@ -166,20 +179,20 @@ const Employees: FC = () => {
             </IconButton>
           }
         />
-        <CardContent>
+        <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 0 }}>
           {loadingFetch && (
-            <div className="flex justify-center">
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
               <CircularProgress />
-            </div>
+            </Box>
           )}
           {!loadingFetch && !sortedData && (
-            <div className="flex justify-center">
-              <Typography className="text-black">No data</Typography>
-            </div>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+              <Typography>No data</Typography>
+            </Box>
           )}
           {sortedData && (
-            <TableContainer component={Paper}>
-              <Table sx={{ minWidth: 650 }} aria-label="employee table">
+            <TableContainer sx={{ flexGrow: 1, height: '100%' }}>
+              <Table stickyHeader aria-label="employee table">
                 <TableHead>
                   <TableRow>
                     <TableCell>ID</TableCell>
@@ -265,7 +278,7 @@ const Employees: FC = () => {
           )}
         </CardContent>
       </Card>
-    </React.Fragment>
+    </Box>
   );
 };
 

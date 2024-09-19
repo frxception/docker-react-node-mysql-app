@@ -56,10 +56,13 @@ const CafeModal: React.FC<CafeModalProps> = ({
   useEffect(() => {
     if (initialData && mode === 'edit') {
       reset({
-        ...initialData,
+        name: initialData.name,
+        description: initialData.description,
+        logo: initialData.logo,
+        location: initialData.location,
       });
     } else {
-      reset({}); // Initialize with an empty array
+      reset({ name: '', description: '', logo: '', location: '' });
     }
   }, [initialData, mode, reset]);
 
@@ -95,7 +98,8 @@ const CafeModal: React.FC<CafeModalProps> = ({
     onSubmit(
       {
         ...data,
-      } as unknown as CafeDataMutationType,
+        employees: initialData?.employees || [], // Keep the existing employees or use an empty array
+      } as CafeDataMutationType,
       initialData?.id
     );
   };
@@ -106,98 +110,100 @@ const CafeModal: React.FC<CafeModalProps> = ({
         open={isOpen}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-        className="flex justify-center items-center">
-        <>
-          <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={loading}>
-            <CircularProgress color="inherit" />
-          </Backdrop>
-          <Box
-            component="form"
-            className="w-3/5 py-10 px-5 bg-white dark:bg-slate-700 rounded-xl"
-            onSubmit={handleSubmit(onFormSubmit)}>
-            <Typography variant="h5" className="mb-15 pb-6">
-              {mode === 'add' ? 'Add Cafe' : 'Edit Cafe'}
-            </Typography>
-
-            <div className="flex flex-col gap-5">
-              <Controller
-                rules={{
-                  required: 'Cafe name is required',
-                  maxLength: { value: 6, message: 'Cafe name must be 6 characters or less' },
-                  validate: validateUniqueName,
-                }}
-                control={control}
-                render={({ field }) => (
-                  <FormControl fullWidth>
-                    <TextField
-                      {...field}
-                      error={!!errors.name}
-                      name="name"
-                      label="Cafe Name"
-                      inputProps={{ maxLength: 6 }}
-                    />
-                    {errors.name && <FormHelperText error>{errors.name.message}</FormHelperText>}
-                  </FormControl>
-                )}
-                name="name"
-              />
-
-              <Controller
-                rules={{ required: true }}
-                control={control}
-                render={({ field }) => (
-                  <FormControl fullWidth>
-                    <TextField
-                      {...field}
-                      error={errors.description ? true : false}
-                      name="description"
-                      label="Description"
-                      inputProps={{ maxLength: 256 }}
-                    />
-                    {errors.description && <FormHelperText error>{errors.description.message}</FormHelperText>}
-                  </FormControl>
-                )}
-                name="description"
-              />
-
-              <Controller
-                rules={{ required: true }}
-                control={control}
-                render={({ field }) => (
-                  <FormControl fullWidth>
-                    <TextField
-                      {...field}
-                      error={errors.location ? true : false}
-                      name="location"
-                      label="Location"
-                    />
-                    {errors.location && <FormHelperText error>{errors.location.message}</FormHelperText>}
-                  </FormControl>
-                )}
-                name="location"
-              />
-
-              <Controller
-                rules={{ required: true }}
-                control={control}
-                render={({ field }) => (
-                  <FormControl fullWidth>
-                    <TextField {...field} error={errors.logo ? true : false} name="logo" label="Logo" />
-                    {errors.logo && <FormHelperText error>{errors.logo.message}</FormHelperText>}
-                  </FormControl>
-                )}
-                name="logo"
-              />
-            </div>
-
-            <div className="mt-5 flex justify-end">
-              <Button type="submit" size="small" variant="contained">
-                {mode === 'add' ? 'Submit' : 'Update'}
+        aria-describedby="modal-modal-description">
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '528px', // Increased from 440px to 528px (additional 20% increase)
+            bgcolor: (theme) => (theme.palette.mode === 'dark' ? theme.palette.grey[800] : '#ffffff'),
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 2,
+          }}>
+          <Typography variant="h6" component="h2" gutterBottom>
+            {mode === 'add' ? 'Add Cafe' : 'Edit Cafe'}
+          </Typography>
+          <Box component="form" onSubmit={handleSubmit(onFormSubmit)} sx={{ mt: 2 }}>
+            <Controller
+              name="name"
+              control={control}
+              rules={{
+                required: 'Cafe name is required',
+                maxLength: { value: 6, message: 'Cafe name must be 6 characters or less' },
+                validate: validateUniqueName,
+              }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="Cafe Name"
+                  error={!!errors.name}
+                  helperText={errors.name?.message}
+                  margin="normal"
+                  inputProps={{ maxLength: 6 }}
+                />
+              )}
+            />
+            <Controller
+              name="description"
+              control={control}
+              rules={{ required: 'Description is required' }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="Description"
+                  error={!!errors.description}
+                  helperText={errors.description?.message}
+                  margin="normal"
+                  multiline
+                  rows={3}
+                />
+              )}
+            />
+            <Controller
+              name="location"
+              control={control}
+              rules={{ required: 'Location is required' }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="Location"
+                  error={!!errors.location}
+                  helperText={errors.location?.message}
+                  margin="normal"
+                />
+              )}
+            />
+            <Controller
+              name="logo"
+              control={control}
+              rules={{ required: 'Logo URL is required' }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="Logo URL"
+                  error={!!errors.logo}
+                  helperText={errors.logo?.message}
+                  margin="normal"
+                />
+              )}
+            />
+            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+              <Button onClick={onClose} sx={{ mr: 1 }}>
+                Cancel
               </Button>
-            </div>
+              <Button type="submit" variant="contained" disabled={loading}>
+                {mode === 'add' ? 'Add' : 'Update'}
+              </Button>
+            </Box>
           </Box>
-        </>
+        </Box>
       </Modal>
 
       <Dialog

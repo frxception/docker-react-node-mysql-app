@@ -1,30 +1,57 @@
-import { Suspense } from 'react';
-
+import { Suspense, useState, useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { Outlet } from 'react-router-dom';
-
+import { Outlet } from '@tanstack/react-router';
+import { Box, CssBaseline, ThemeProvider } from '@mui/material';
+import { createTheme } from '@mui/material/styles';
 import errorBoundary from './ErrorBoundary.tsx';
-import FooterComponent from './Footer.tsx';
 import Header from './Header.tsx';
+import Sidebar from './Sidebar.tsx';
 
 const LayoutComponent = () => {
+  const [darkMode, setDarkMode] = useState(() => {
+    const savedMode = localStorage.getItem('darkMode');
+    return savedMode ? JSON.parse(savedMode) : false;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
+  }, [darkMode]);
+
+  const theme = createTheme({
+    palette: {
+      mode: darkMode ? 'dark' : 'light',
+    },
+  });
+
+  const handleThemeChange = () => {
+    setDarkMode(!darkMode);
+  };
+
   return (
-    <div className="w-full h-full">
-      <Header />
-      <div className="px-4 py-20 flex flex-col min-h-screen">
-        <ErrorBoundary fallbackRender={errorBoundary}>
-          <Suspense
-            fallback={
-              <div className="w-full h-full flex justify-center items-center">
-                <span>Loading...</span>
-              </div>
-            }>
-            <Outlet />
-          </Suspense>
-        </ErrorBoundary>
-      </div>
-      <FooterComponent />
-    </div>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+        <Header darkMode={darkMode} setDarkMode={handleThemeChange} />
+        <Sidebar />
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            p: 3,
+            mt: 8,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'auto',
+            height: 'calc(100vh - 64px)', // Adjust this value based on your header height
+          }}>
+          <ErrorBoundary fallbackRender={errorBoundary}>
+            <Suspense fallback={<div>Loading...</div>}>
+              <Outlet />
+            </Suspense>
+          </ErrorBoundary>
+        </Box>
+      </Box>
+    </ThemeProvider>
   );
 };
 

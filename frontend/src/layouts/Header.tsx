@@ -1,32 +1,24 @@
-import { Link } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, IconButton } from '@mui/material';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 
-import { ButtonTheme } from '@/components';
-import { navList } from '@/configs/constant/navigation.constants.tsx';
-import { useActiveMenu } from '@/hooks';
+interface HeaderProps {
+  darkMode: boolean;
+  setDarkMode: () => void;
+}
 
-const Header = () => {
-  const { checkActive } = useActiveMenu();
-
+const Header: React.FC<HeaderProps> = ({ darkMode, setDarkMode }) => {
   return (
-    <header className="bg-secondary block fixed w-full inset-x-0 z-30 h-16 px-4 shadow-xl">
-      <div className="w-full h-full flex items-center justify-between mx-auto">
-        <div className="w-full flex justify-between items-center">
-          <div className="flex gap-5">
-            {navList.map((item) => (
-              <Link key={item.key} to={item.key}>
-                <span
-                  className={`uppercase font-bold text-sm px-4 py-2 ${
-                    checkActive(item.key) ? 'bg-slate-400 dark:bg-slate-700' : 'bg-slate-300 dark:bg-slate-500'
-                  }  hover:bg-slate-400  dark:hover:bg-slate-700 rounded-md transition-all duration-150`}>
-                  {item.label}
-                </span>
-              </Link>
-            ))}
-          </div>
-          <ButtonTheme />
-        </div>
-      </div>
-    </header>
+    <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+      <Toolbar>
+        <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+          Cafe Management
+        </Typography>
+        <IconButton color="inherit" onClick={setDarkMode}>
+          {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+        </IconButton>
+      </Toolbar>
+    </AppBar>
   );
 };
 

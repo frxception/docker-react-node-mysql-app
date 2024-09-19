@@ -13,6 +13,7 @@ import { useModalStore } from '@/hooks';
 import AddIcon from '@mui/icons-material/Add';
 import {
   Backdrop,
+  Box, // Add this line
   Card,
   CardContent,
   CardHeader,
@@ -75,7 +76,7 @@ const Cafes = () => {
   const handleUpdateCafe = (body: CafeDataMutationType, id?: string) => {
     if (!id) return;
     return updateCafe(
-      { id, data: omit(body, 'id') },
+      { id, data: { ...body, employees: body.employees.map((emp) => emp.id) } },
       {
         onSuccess: () => {
           void refetch();
@@ -153,7 +154,7 @@ const Cafes = () => {
   }, [dataQueryList, order, orderBy]);
 
   return (
-    <React.Fragment>
+    <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={loadingDelete || loadingUpdate}>
@@ -170,7 +171,7 @@ const Cafes = () => {
         initialData={selectedCafe}
       />
 
-      <Card>
+      <Card sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', width: '100%' }}>
         <CardHeader
           title="Cafe"
           action={
@@ -179,20 +180,20 @@ const Cafes = () => {
             </IconButton>
           }
         />
-        <CardContent>
+        <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 0 }}>
           {loadingFetch && (
-            <div className="flex justify-center">
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
               <CircularProgress />
-            </div>
+            </Box>
           )}
           {!loadingFetch && !dataQueryList && (
-            <div className="flex justify-center">
-              <Typography className="text-black">No data</Typography>
-            </div>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+              <Typography>No data</Typography>
+            </Box>
           )}
           {sortedData && (
-            <TableContainer component={Paper}>
-              <Table sx={{ minWidth: 650 }} aria-label="cafe table">
+            <TableContainer sx={{ flexGrow: 1, height: '100%' }}>
+              <Table stickyHeader aria-label="cafe table">
                 <TableHead>
                   <TableRow>
                     <TableCell>ID</TableCell>
@@ -270,7 +271,7 @@ const Cafes = () => {
           )}
         </CardContent>
       </Card>
-    </React.Fragment>
+    </Box>
   );
 };
 
