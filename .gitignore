@@ -17,7 +17,6 @@ dist
 dist-ssr
 *.local
 
-.env
 *docs
 
 
@@ -33,3 +32,8 @@ frontend/docs
 
 backend/.idea
 frontend/.idea
+
+backend/dbdata
+
+# TODO: For demo purposes we allow .env to be pushed
+# .env

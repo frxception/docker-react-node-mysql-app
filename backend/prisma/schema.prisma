@@ -10,42 +10,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Product {
-  id           Int          @id @default(autoincrement())
-  name         String       @unique
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  price        Float
-  sale         Boolean      @default(false)
-  availibility Availibility
-  reviews      Review[]
-  tags         Tag[]
-  description  Description?
+model Cafes {
+  id          Int    @id @default(autoincrement())
+  name        String @unique
+  description String
+  employees   Int
+  logo        String
+  location    String
 }
 
-model Description {
-  id        Int     @id @default(autoincrement())
-  content   String
-  product   Product @relation(fields: [productId], references: [id])
-  productId Int     @unique
-}
-
-model Review {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String
-  rating    Int
-  product   Product @relation(fields: [productId], references: [id])
-  productId Int
-}
-
-model Tag {
-  id       Int       @id @default(autoincrement())
-  content  String
-  products Product[]
-}
-
-enum Availibility {
-  IN_STORE
-  ONLINE
+model Employees {
+  id            Int    @id @default(autoincrement())
+  name          String
+  email_address String
+  phone_number  String
+  days_worked   Int
+  cafe          String @unique
 }

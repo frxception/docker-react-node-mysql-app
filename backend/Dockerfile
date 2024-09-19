@@ -25,7 +25,8 @@ EXPOSE $NODE_DOCKER_PORT
 
 
 CMD ["./waitForIt.sh", "db:3306", "--", "./migratePrisma.sh"]
-CMD ["npx","prisma", "migrate", "dev"]
 
+CMD ["npx","prisma", "migrate", "dev"]
 CMD ["pnpm", "run", "start"]
+
 #CMD ["node","dist/main.js"]

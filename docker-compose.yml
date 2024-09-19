@@ -11,6 +11,10 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
       - MYSQL_DATABASE=$MYSQL_DATABASE
+    networks:
+      - backend-network
+    volumes:
+      - ./backend/dbdata:/var/lib/mysql
 
   backend:
     restart: always
@@ -21,11 +25,14 @@ services:
       context: ./backend
     ports:
       - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
-    volumes:
-      - .:/app
     environment:
       - CLIENT_ORIGIN=$CLIENT_ORIGIN
       - DATABASE_URL=$DATABASE_URL
+    networks:
+      - backend-network
+      - frontend-network
+    volumes:
+      - ./backend:/usr/www/src
 
   frontend:
     image: vite_app
@@ -38,4 +45,14 @@ services:
         - REACT_APP_API_BASE_URL=$CLIENT_API_BASE_URL
     ports:
       - $REACT_LOCAL_PORT:$REACT_DOCKER_PORT
+    volumes:
+      - .:/app
+    networks:
+      - frontend-network
 
+volumes:
+  dbdata:
+
+networks:
+  backend-network:
+  frontend-network:
