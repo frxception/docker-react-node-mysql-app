@@ -4,12 +4,8 @@ import {
   Modal,
   Box,
   Typography,
-  FormControl,
   TextField,
-  FormHelperText,
   Button,
-  Backdrop,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -98,7 +94,7 @@ const CafeModal: React.FC<CafeModalProps> = ({
     onSubmit(
       {
         ...data,
-        employees: initialData?.employees || [], // Keep the existing employees or use an empty array
+        employees: initialData?.employees || [],
       } as CafeDataMutationType,
       initialData?.id
     );

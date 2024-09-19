@@ -26,12 +26,11 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
   Avatar,
   TableSortLabel,
 } from '@mui/material';
-import { omit, sortBy } from 'lodash';
-import React, { useMemo, useState } from 'react';
+import { sortBy } from 'lodash';
+import { useMemo, useState } from 'react';
 import { FiTrash2, FiEdit } from 'react-icons/fi';
 import CafeModal from './CafeModal';
 
@@ -76,7 +75,7 @@ const Cafes = () => {
   const handleUpdateCafe = (body: CafeDataMutationType, id?: string) => {
     if (!id) return;
     return updateCafe(
-      { id, data: { ...body, employees: body.employees.map((emp) => emp.id) } },
+      { id, data: { ...body, employees: body?.employees?.map((emp) => emp.id) as any } },
       {
         onSuccess: () => {
           void refetch();
