@@ -7,13 +7,12 @@ import { FiEdit, FiTrash2 } from 'react-icons/fi';
 import {
   Avatar,
   Backdrop,
-  Box, // Add this line
+  Box,
   Card,
   CardContent,
   CardHeader,
   CircularProgress,
   IconButton,
-  Paper,
   Table,
   TableBody,
   TableCell,
