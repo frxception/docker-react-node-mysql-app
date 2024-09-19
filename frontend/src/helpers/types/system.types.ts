@@ -1,11 +1,11 @@
 import { QueryKey, UseQueryOptions } from '@tanstack/react-query';
 
-export type PageParams = {
+export type PageParamsType = {
   page?: number;
   limit?: number;
 };
 
-export type QueryOptions<T, TQueryData = unknown, TError = unknown> = Omit<
+export type QueryOptionsType<T, TQueryData = unknown, TError = unknown> = Omit<
   UseQueryOptions<TQueryData, TError, T, QueryKey>,
   | 'queryKey'
   | 'queryFn'

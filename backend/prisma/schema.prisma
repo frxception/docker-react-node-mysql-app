@@ -1,8 +1,6 @@
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-3.0.x"]
-  // binaryTargets = ["native", "darwin", "debian-openssl-1.1.x"]
-  // binaryTargets = ["native", "linux-musl-openssl-3.0.0"]
 }
 
 datasource db {
@@ -14,9 +12,9 @@ model Cafes {
   id          Int    @id @default(autoincrement())
   name        String @unique
   description String
-  employees   Int
   logo        String
   location    String
+  employees   Int
 }
 
 model Employees {

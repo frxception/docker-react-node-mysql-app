@@ -2,11 +2,11 @@ import { cloneDeep } from 'lodash';
 import { Link } from 'react-router-dom';
 
 import { HOME_PATH, EMPLOYEES_PATH } from '@/configs';
-import { UiTypes, TypeRoutes } from '@/helpers/types/ui.types.ts';
+import { NavType, RoutesType } from '@/helpers/types/ui.types.ts';
 import { capitalizeFirstLetter } from '@/helpers/utils';
 import { Cafes, Employees } from '@/pages';
 
-const navigationConstants: UiTypes[] = [
+const navigationConstants: NavType[] = [
   {
     key: HOME_PATH,
     label: "Cafe's",
@@ -19,7 +19,7 @@ const navigationConstants: UiTypes[] = [
   },
 ];
 
-const getRoutes = (arr: TypeRoutes[], nav: UiTypes, basePath = '') => {
+const getRoutes = (arr: RoutesType[], nav: NavType, basePath = '') => {
   if (nav.children) {
     for (const n of nav.children) {
       getRoutes(arr, n, basePath + nav.key);
@@ -35,7 +35,7 @@ const getRoutes = (arr: TypeRoutes[], nav: UiTypes, basePath = '') => {
   return arr;
 };
 
-const addLink = (nav: UiTypes, path: string) => {
+const addLink = (nav: NavType, path: string) => {
   return nav.children ? (
     capitalizeFirstLetter(nav.label as string)
   ) : (
@@ -43,10 +43,10 @@ const addLink = (nav: UiTypes, path: string) => {
   );
 };
 
-const getShowNavigation = (nav: UiTypes, basePath = ''): UiTypes | undefined => {
+const getShowNavigation = (nav: NavType, basePath = ''): NavType | undefined => {
   if (!nav.label) return;
   if (nav.children) {
-    const arr: UiTypes[] = [];
+    const arr: NavType[] = [];
     for (const n of nav.children) {
       const formatN = getShowNavigation(n, basePath + nav.key);
       if (formatN) arr.push(formatN);
@@ -63,9 +63,9 @@ const getShowNavigation = (nav: UiTypes, basePath = ''): UiTypes | undefined => 
   };
 };
 
-const menuList: UiTypes[] = [];
-const routeList: TypeRoutes[] = [];
-const navList: UiTypes[] = navigationConstants.map((nav) => ({
+const menuList: NavType[] = [];
+const routeList: RoutesType[] = [];
+const navList: NavType[] = navigationConstants.map((nav) => ({
   key: nav.key,
   label: nav.label,
 }));

@@ -1,20 +1,20 @@
 import { ReactElement } from 'react';
 
-type NavsChild = {
+type NavsChildType = {
   key: string;
   label?: string | ReactElement;
   element?: ReactElement;
 };
 
-export type UiTypes = NavsChild & {
-  children?: UiTypes[];
+export type NavType = NavsChildType & {
+  children?: NavType[];
 };
 
-type RouteChild = {
+type RouteChildType = {
   path: string;
   element: ReactElement;
 };
 
-export type TypeRoutes = RouteChild & {
-  children?: RouteChild[];
+export type RoutesType = RouteChildType & {
+  children?: RouteChildType[];
 };
