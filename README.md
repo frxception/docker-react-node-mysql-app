@@ -1,10 +1,35 @@
 
-# Frontend+Backend Docker Demo
+# Docker+Frontend+Backend  Demo
+
+
+## Overview
+
+### Backend
+* NestJS
+* Prisma
+* Docker
+* Mysql
+* Vite
+* Pnpm
+* Typescript
+
+
+### Frontend
+* React
+* Typescript
+* Material-UI,
+* Tanstack React Query
+* Tanstack React Router
+* Tailwind
+* Vite
+* Pnpm
+* Docker
+* Nginx
 
 
 
 
-## Installation
+## Setup
 
 
 
@@ -29,7 +54,7 @@ $ docker-compose up
 ````
 
 
-#### 2) Frontend (default url http://localhost:3000)
+#### 2) Frontend (default url http://localhost:8080)
 ```bash
 $ cd frontend
 $ pnpm install
