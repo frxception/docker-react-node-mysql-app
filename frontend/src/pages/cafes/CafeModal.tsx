@@ -26,7 +26,6 @@ type CafeModalProps = {
   onClose: () => void;
   onSubmit: (data: CafeDataMutationType, id?: string) => void;
   loading: boolean;
-  existingCafeNames: string[];
   mode: 'add' | 'edit';
   initialData?: CafeDataMutationType & { id?: string };
 };
@@ -36,7 +35,6 @@ const CafeModal: React.FC<CafeModalProps> = ({
   onClose,
   onSubmit,
   loading,
-  existingCafeNames,
   mode,
   initialData,
 }) => {
@@ -80,16 +78,6 @@ const CafeModal: React.FC<CafeModalProps> = ({
     setConfirmOpen(false);
   };
 
-  const validateUniqueName = (value: string) => {
-    if (mode === 'add' && existingCafeNames.includes(value)) {
-      return 'A cafe with this name already exists';
-    }
-    if (mode === 'edit' && value !== initialData?.name && existingCafeNames.includes(value)) {
-      return 'A cafe with this name already exists';
-    }
-    return true;
-  };
-
   const onFormSubmit = (data: Input) => {
     onSubmit(
       {
@@ -128,8 +116,7 @@ const CafeModal: React.FC<CafeModalProps> = ({
               control={control}
               rules={{
                 required: 'Cafe name is required',
-                maxLength: { value: 6, message: 'Cafe name must be 6 characters or less' },
-                validate: validateUniqueName,
+                maxLength: { value: 6, message: 'Cafe name must be 6 characters or less' }
               }}
               render={({ field }) => (
                 <TextField

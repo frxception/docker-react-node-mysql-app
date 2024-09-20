@@ -1,6 +1,6 @@
 import { Order } from '@/helpers/types/ui.types.ts';
 import { getFormattedDateTime } from '@/helpers/utils';
-import { omit } from 'lodash';
+import { isEmpty, omit } from 'lodash';
 import { FC, useMemo, useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import { FiEdit, FiTrash2 } from 'react-icons/fi';
@@ -62,20 +62,20 @@ const Employees: FC = () => {
 
   const sortedData = useMemo(() => {
     if (queryData) {
-      return [...(queryData as unknown as ResponseDataType['data'])].sort((a, b) => {
+      return [...(queryData as unknown as ResponseDataType['data'])]?.sort((a, b) => {
         if (orderBy === 'name') {
-          return order === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+          return order === 'asc' ? a?.name?.localeCompare(b?.name) : b?.name?.localeCompare(a?.name);
         }
         if (orderBy === 'days') {
-          return order === 'asc' ? a.days - b.days : b.days - a.days;
+          return order === 'asc' ? a?.days - b?.days : b?.days - a?.days;
         }
         if (orderBy === 'createdAt') {
           return order === 'asc'
-            ? new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-            : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            ? new Date(a?.createdAt).getTime() - new Date(b?.createdAt).getTime()
+            : new Date(b?.createdAt).getTime() - new Date(a?.createdAt).getTime();
         }
         if (orderBy === 'gender') {
-          return order === 'asc' ? a.name.localeCompare(b.gender) : b.name.localeCompare(a.gender);
+          return order === 'asc' ? a?.name?.localeCompare(b?.gender) : b?.name?.localeCompare(a?.gender);
         }
         return 0;
       });
@@ -139,6 +139,100 @@ const Employees: FC = () => {
     open();
   };
 
+  const renderTable = () => {
+    if (!loadingFetch && isEmpty(sortedData)) {
+      return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+              <Typography>No data</Typography>
+            </Box>
+    }
+    return sortedData && (
+      <TableContainer sx={{ flexGrow: 1, height: '100%' }}>
+        <Table stickyHeader aria-label="employee table">
+          <TableHead>
+            <TableRow>
+              <TableCell>ID</TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === 'name'}
+                  direction={orderBy === 'name' ? order : 'asc'}
+                  onClick={() => handleRequestSort('name')}>
+                  Name
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === 'gender'}
+                  direction={orderBy === 'gender' ? order : 'asc'}
+                  onClick={() => handleRequestSort('gender')}>
+                  Gender
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Phone</TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === 'days'}
+                  direction={orderBy === 'days' ? order : 'asc'}
+                  onClick={() => handleRequestSort('days')}>
+                  Days
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === 'createdAt'}
+                  direction={orderBy === 'createdAt' ? order : 'asc'}
+                  onClick={() => handleRequestSort('createdAt')}>
+                  Added
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>Cafe</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {sortedData?.map((data) => (
+              <TableRow key={data?.id}>
+                <TableCell component="th" scope="row">
+                  {data?.id}
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  {data?.name}
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  {data?.gender?.toUpperCase() === 'M' ? 'Male' : 'Female'}
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  {data?.email}
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  {data?.phone}
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  {data?.days}
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  {getFormattedDateTime(data?.createdAt)}
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  <Avatar src={data?.cafe?.logo} />
+                  {data?.cafe?.name}
+                </TableCell>
+                <TableCell align="left">
+                  <IconButton onClick={() => handleOpenEditModal(data)}>
+                    <FiEdit />
+                  </IconButton>
+                  <IconButton onClick={() => handleDelete(data)}>
+                    <FiTrash2 />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    );
+  }
+
   return (
     <Box
       sx={{
@@ -179,102 +273,13 @@ const Employees: FC = () => {
           }
         />
         <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 0 }}>
-          {loadingFetch && (
+          {loadingFetch ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
               <CircularProgress />
             </Box>
-          )}
-          {!loadingFetch && !sortedData && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-              <Typography>No data</Typography>
-            </Box>
-          )}
-          {sortedData && (
-            <TableContainer sx={{ flexGrow: 1, height: '100%' }}>
-              <Table stickyHeader aria-label="employee table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>ID</TableCell>
-                    <TableCell>
-                      <TableSortLabel
-                        active={orderBy === 'name'}
-                        direction={orderBy === 'name' ? order : 'asc'}
-                        onClick={() => handleRequestSort('name')}>
-                        Name
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell>
-                      <TableSortLabel
-                        active={orderBy === 'gender'}
-                        direction={orderBy === 'gender' ? order : 'asc'}
-                        onClick={() => handleRequestSort('gender')}>
-                        Gender
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell>Email</TableCell>
-                    <TableCell>Phone</TableCell>
-                    <TableCell>
-                      <TableSortLabel
-                        active={orderBy === 'days'}
-                        direction={orderBy === 'days' ? order : 'asc'}
-                        onClick={() => handleRequestSort('days')}>
-                        Days
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell>
-                      <TableSortLabel
-                        active={orderBy === 'createdAt'}
-                        direction={orderBy === 'createdAt' ? order : 'asc'}
-                        onClick={() => handleRequestSort('createdAt')}>
-                        Added
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell>Cafe</TableCell>
-                    <TableCell>Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {sortedData.map((data) => (
-                    <TableRow key={data?.id}>
-                      <TableCell component="th" scope="row">
-                        {data?.id}
-                      </TableCell>
-                      <TableCell component="th" scope="row">
-                        {data?.name}
-                      </TableCell>
-                      <TableCell component="th" scope="row">
-                        {data?.gender?.toUpperCase() === 'M' ? 'Male' : 'Female'}
-                      </TableCell>
-                      <TableCell component="th" scope="row">
-                        {data?.email}
-                      </TableCell>
-                      <TableCell component="th" scope="row">
-                        {data?.phone}
-                      </TableCell>
-                      <TableCell component="th" scope="row">
-                        {data?.days}
-                      </TableCell>
-                      <TableCell component="th" scope="row">
-                        {getFormattedDateTime(data?.createdAt)}
-                      </TableCell>
-                      <TableCell component="th" scope="row">
-                        <Avatar src={data?.cafe?.logo} />
-                        {data?.cafe?.name}
-                      </TableCell>
-                      <TableCell align="left">
-                        <IconButton onClick={() => handleOpenEditModal(data)}>
-                          <FiEdit />
-                        </IconButton>
-                        <IconButton onClick={() => handleDelete(data)}>
-                          <FiTrash2 />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
+          ) : renderTable() }
+        
+
         </CardContent>
       </Card>
     </Box>

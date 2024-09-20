@@ -34,7 +34,6 @@ const Sidebar = () => {
               }}>
               <ListItem disablePadding>
                 <ListItemButton
-                  selected={isActive}
                   sx={{
                     '&.Mui-selected': {
                       backgroundColor: theme.palette.action.selected,
@@ -49,12 +48,7 @@ const Sidebar = () => {
                     }}>
                     {route.icon}
                   </ListItemIcon>
-                  <ListItemText
-                    primary={route.label}
-                    sx={{
-                      color: isActive ? theme.palette.primary.main : 'inherit',
-                    }}
-                  />
+                  <ListItemText primary={route.label} />
                 </ListItemButton>
               </ListItem>
             </Link>

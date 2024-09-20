@@ -29,7 +29,7 @@ import {
   Avatar,
   TableSortLabel,
 } from '@mui/material';
-import { sortBy } from 'lodash';
+import { isEmpty, sortBy } from 'lodash';
 import { useMemo, useState } from 'react';
 import { FiTrash2, FiEdit } from 'react-icons/fi';
 import CafeModal from './CafeModal';
@@ -59,9 +59,10 @@ const Cafes = () => {
     }
   }, [queryData]);
 
-  const existingCafeNames = useMemo(() => {
-    return dataQueryList ? dataQueryList.map((cafe: CafeDataType) => cafe.name) : [];
-  }, [dataQueryList]);
+  // const existingCafeNames = [];
+  //   useMemo(() => {
+  //   return dataQueryList ? dataQueryList.map((cafe: CafeDataType) => cafe.name) : [];
+  // }, [dataQueryList]);
 
   const handleCreateCafe = (body: CafeDataMutationType) => {
     return addCafe(body, {
@@ -124,7 +125,7 @@ const Cafes = () => {
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
-
+  
   const sortedData = useMemo(() => {
     if (dataQueryList) {
       return [...dataQueryList].sort((a, b) => {
@@ -152,6 +153,92 @@ const Cafes = () => {
     return [];
   }, [dataQueryList, order, orderBy]);
 
+  const renderTable = () => {
+    if (!loadingFetch && isEmpty(sortedData)) {
+      return (<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+        <Typography>No data</Typography>
+      </Box>);
+    }
+    return (
+      <TableContainer sx={{ flexGrow: 1, height: '100%' }}>
+        <Table stickyHeader aria-label="cafe table">
+          <TableHead>
+            <TableRow>
+              <TableCell>ID</TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === 'name'}
+                  direction={orderBy === 'name' ? order : 'asc'}
+                  onClick={() => handleRequestSort('name')}>
+                  Name
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === 'description'}
+                  direction={orderBy === 'description' ? order : 'asc'}
+                  onClick={() => handleRequestSort('description')}>
+                  Description
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>Employees</TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === 'location'}
+                  direction={orderBy === 'location' ? order : 'asc'}
+                  onClick={() => handleRequestSort('location')}>
+                  Location
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === 'updatedAt'}
+                  direction={orderBy === 'updatedAt' ? order : 'asc'}
+                  onClick={() => handleRequestSort('updatedAt')}>
+                  Update
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {sortedData.map((data, index) => (
+              <TableRow key={`${data?.id}-${index}`}>
+                <TableCell component="th" scope="row">
+                  {data?.id}
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  <Avatar src={data.logo} />
+                  {data?.name}
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  {data?.description}
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  {data?.employees?.map((o, i) => <ol key={`${o?.id}-${i}`}>{`- ${o?.name}`}</ol>)}
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  {data?.location}
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  {getFormattedDateTime(data?.updatedAt)}
+                </TableCell>
+                <TableCell align="left">
+                  <IconButton onClick={() => handleOpenEditModal(data)}>
+                    <FiEdit />
+                  </IconButton>
+                  <IconButton onClick={() => handleDelete(data)}>
+                    <FiTrash2 />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    );
+  }
+
   return (
     <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Backdrop
@@ -165,7 +252,6 @@ const Cafes = () => {
         onClose={close}
         onSubmit={handleSubmit}
         loading={loadingCreate || loadingUpdate}
-        existingCafeNames={existingCafeNames}
         mode={modalMode}
         initialData={selectedCafe}
       />
@@ -180,94 +266,12 @@ const Cafes = () => {
           }
         />
         <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 0 }}>
-          {loadingFetch && (
+          {loadingFetch ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
               <CircularProgress />
             </Box>
-          )}
-          {!loadingFetch && !dataQueryList && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-              <Typography>No data</Typography>
-            </Box>
-          )}
-          {sortedData && (
-            <TableContainer sx={{ flexGrow: 1, height: '100%' }}>
-              <Table stickyHeader aria-label="cafe table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>ID</TableCell>
-                    <TableCell>
-                      <TableSortLabel
-                        active={orderBy === 'name'}
-                        direction={orderBy === 'name' ? order : 'asc'}
-                        onClick={() => handleRequestSort('name')}>
-                        Name
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell>
-                      <TableSortLabel
-                        active={orderBy === 'description'}
-                        direction={orderBy === 'description' ? order : 'asc'}
-                        onClick={() => handleRequestSort('description')}>
-                        Description
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell>Employees</TableCell>
-                    <TableCell>
-                      <TableSortLabel
-                        active={orderBy === 'location'}
-                        direction={orderBy === 'location' ? order : 'asc'}
-                        onClick={() => handleRequestSort('location')}>
-                        Location
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell>
-                      <TableSortLabel
-                        active={orderBy === 'updatedAt'}
-                        direction={orderBy === 'updatedAt' ? order : 'asc'}
-                        onClick={() => handleRequestSort('updatedAt')}>
-                        Update
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell>Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {sortedData.map((data) => (
-                    <TableRow key={data?.id}>
-                      <TableCell component="th" scope="row">
-                        {data?.id}
-                      </TableCell>
-                      <TableCell component="th" scope="row">
-                        <Avatar src={data.logo} />
-                        {data?.name}
-                      </TableCell>
-                      <TableCell component="th" scope="row">
-                        {data?.description}
-                      </TableCell>
-                      <TableCell component="th" scope="row">
-                        {data?.employees.map((o) => <ol key={o.id}>{`- ${o.name}`}</ol>)}
-                      </TableCell>
-                      <TableCell component="th" scope="row">
-                        {data?.location}
-                      </TableCell>
-                      <TableCell component="th" scope="row">
-                        {getFormattedDateTime(data?.updatedAt)}
-                      </TableCell>
-                      <TableCell align="left">
-                        <IconButton onClick={() => handleOpenEditModal(data)}>
-                          <FiEdit />
-                        </IconButton>
-                        <IconButton onClick={() => handleDelete(data)}>
-                          <FiTrash2 />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
+          ) : renderTable()}
+          
         </CardContent>
       </Card>
     </Box>

@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Header
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { CafesService } from './cafes.service';
@@ -20,11 +21,13 @@ export class CafesController {
   }
 
   @Get()
+  @Header('Content-Type', 'application/json')
   findAll() {
     return this.cafesService.findAll();
   }
 
   @Get(':id')
+  @Header('Content-Type', 'application/json')  
   findOne(@Param('id') id: string) {
     return this.cafesService.findOne(+id);
   }

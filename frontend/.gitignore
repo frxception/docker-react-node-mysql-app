@@ -3,7 +3,6 @@
 .idea
 .DS_Store
 
-
 logs
 *.log
 npm-debug.log*
@@ -17,5 +16,7 @@ dist
 dist-ssr
 *.local
 
-.env
 docs
+
+# NOTE: In real world we need to add this file to get ignore when pushing to the repo
+# .env

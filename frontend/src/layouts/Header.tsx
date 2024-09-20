@@ -12,7 +12,7 @@ const Header: React.FC<HeaderProps> = ({ darkMode, setDarkMode }) => {
     <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
       <Toolbar>
         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-          Cafe Management
+          Cafe Employee
         </Typography>
         <IconButton color="inherit" onClick={setDarkMode}>
           {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}

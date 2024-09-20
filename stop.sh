@@ -1,4 +1,4 @@
 #!/bin/bash
 
-echo "===========[ Stop docker] ============"
+echo "===========[ Stop docker] ============ $(pwd)"
 docker-compose down
