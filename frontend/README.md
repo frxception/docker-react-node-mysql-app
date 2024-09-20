@@ -3,7 +3,7 @@
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 
-### Features
+## Features
 
 - ⚡ [React.js](https://react.dev/)
 - ⚡ [Material-UI](https://mui.com/)
@@ -25,24 +25,25 @@ This template provides a minimal setup to get React working in Vite with HMR and
 Run the following command on your local environment:
 
 ```shell
-git clone --depth=1 https://github.com/sonht113/react-boilerplate-for-starter.git
-cd my-project-name
-pnpm install
+$ pnpm install
 ```
 
 Then, you can run locally in development mode with live reload:
 
 ```shell
-pnpm run dev
+$ pnpm run dev
 ```
 
-Open http://localhost:5173 with your favorite browser to see your project.
+Open http://localhost:5173 (development) with your favorite browser to see your project.
 
+> **Important:** 
+> Backend should be already running at http://localhost:8888 or whatever the .env settings is configured
+
+##  Project Structure
 ```shell
 .
 ├── README.md                       # README file
 ├── .github                         # GitHub folder
-├── .husky                          # Husky configuration
 ├── public                          # Public assets folder
 ├── src
 │   ├── apis                        # Common apis folder

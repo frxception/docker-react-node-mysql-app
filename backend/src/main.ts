@@ -13,6 +13,6 @@ async function bootstrap() {
   };
 
   app.enableCors(options);
-  await app.listen(port);
+  await app.listen(port || 8888);
 }
 bootstrap();

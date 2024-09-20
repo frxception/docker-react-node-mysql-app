@@ -26,31 +26,56 @@
 * Docker
 * Nginx
 
-
-
-
 ## Setup
 
+### Run and Deploy Instantly
 
-
-### Run and Deploy Instantly 
+### This would run the script to install and setup backend and frontend apps
 ```bash
-$ docker-compose up
-
-or
-
-$ docker-compose up --build
+$ chmod +x start.sh
+$ chmod +x stop.sh
 ```
 
 
-### Run Individually
+#### Start the docker apps
+```bash
+$ ./start.sh
+```
+
+
+#### Stop the docker apps
+```bash
+$ ./stop.sh
+```
+
+<br>
+
+
+---
+
+### Run Manually
 
 #### 1) Backend (default url http://localhost:8888)
 
 ```bash
 $ cd backend
+
+# install deps
 $ pnpm install
+
+# run mysql db server
 $ docker-compose up
+
+# run prisma migration
+$ npx prisma migrate dev
+
+# (optional) add predefined data to db
+$ npx prisma db seed
+
+# run backend app
+$ pnpm run start
+or
+$ pnpm run start:dev
 ````
 
 
@@ -58,7 +83,7 @@ $ docker-compose up
 ```bash
 $ cd frontend
 $ pnpm install
-$ pnpm run start
+$ pnpm run dev
 ````
 
 

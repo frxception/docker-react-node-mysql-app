@@ -20,6 +20,16 @@ $ pnpm run start:dev
 $ pnpm run start:prod
 ```
 
+
+> Once backend mysql db is running we need to run Prisma CLI to apply migrations and generate the Prisma client:
+
+```bash
+$ npx prisma migrate dev
+
+$ npx prisma generate
+```
+
+
 ## Test
 
 ```bash
@@ -33,13 +43,6 @@ $ pnpm run test:e2e
 $ pnpm run test:cov
 ```
  
-##
-Use Prisma CLI to apply migrations and generate the Prisma client:
-
-```bash
-$ npx prisma migrate dev
-$ npx prisma generate
-```
 
 ### Seed the Cafes and Employees (add dummy data)
 
@@ -57,7 +60,7 @@ Then just to be sure run again...
 $ npx prisma migrate dev
 ```
 
-After that, seed data is now added.
+After that, seeded data is now planted in the db ;-)
 
 
 ## API

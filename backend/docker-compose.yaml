@@ -9,17 +9,3 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_DATABASE=cedb
-
-
-  backend:
-    build: .
-    depends_on:
-      - db
-    ports:
-      - '8888:8888'
-    volumes:
-      - .:/app
-    environment:
-      - DATABASE_URL=mysql://root:password@db:3306/cedb
-      - NODE_DOCKER_PORT=8888
-
