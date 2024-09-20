@@ -37,8 +37,8 @@ $ pnpm run test:cov
 Use Prisma CLI to apply migrations and generate the Prisma client:
 
 ```bash
-npx prisma migrate dev
-npx prisma generate
+$ npx prisma migrate dev
+$ npx prisma generate
 ```
 
 ### Seed the Cafes and Employees (add dummy data)
@@ -46,20 +46,18 @@ npx prisma generate
 
 While the docker container/db server is running run the following:
 ```bash
-npx prisma db seed
-
-or 
-
-pnpm run seed
+$ npx prisma db seed
+# or 
+$ pnpm run seed
 ```
 
 Then just to be sure run again...
 
-```prisma
-npx prisma migrate dev
+```sh
+$ npx prisma migrate dev
 ```
 
-Afterwards, seed data is in db already.
+After that, seed data is now added.
 
 
 ## API
@@ -80,16 +78,18 @@ model Cafes {
 }
 
 model Employees {
-  id            Int      @id @default(autoincrement())
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  name          String
-  email_address String
-  phone_number  String
-  days_worked   Int
-  cafe          Cafes    @relation(fields: [cafesId], references: [id])
-  cafesId       Int
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  cafesId   Int
+  days      Int
+  email     String
+  phone     String
+  gender    String
+  cafe      Cafes    @relation(fields: [cafesId], references: [id])
 }
+
 
 ```
 
@@ -113,59 +113,178 @@ http://location:8888
 * UPDATE: /cafes/:id (PATCH)
 * DELETE: /cafes/:id (DELETE)
 
-### Sample
+## Sample Data
 
-**Create Cafes**
-<img src="screenshots/cafe.png" />
-Request:
+### Cafes (http://localhost:8888/cafes)
 ```json
-{
-  "name": "Cafe2",
-  "description": "Some desc",
-  "employees": 2,
-  "logo": "somelogo.png",
-  "location": "sg"
-}
-
+[
+  {
+    "id": 1,
+    "name": "Digong Cafe",
+    "createdAt": "2024-09-19T21:26:04.929Z",
+    "updatedAt": "2024-09-19T21:26:04.929Z",
+    "description": "Lorem ipsum dolor sit amet",
+    "logo": "https://gravatar.com/avatar/ef7b90c86c01dea8b4313dbb1cd0d015?s=400&d=robohash&r=x",
+    "location": "Tampines",
+    "employees": [
+      {
+        "id": 1,
+        "createdAt": "2024-09-19T21:26:04.975Z",
+        "updatedAt": "2024-09-19T21:26:04.975Z",
+        "name": "Alice Guo",
+        "cafesId": 1,
+        "days": 7,
+        "email": "alice.guo@prisma.io",
+        "phone": "+6588888888",
+        "gender": "F"
+      },
+      {
+        "id": 2,
+        "createdAt": "2024-09-19T21:26:04.992Z",
+        "updatedAt": "2024-09-19T21:26:04.992Z",
+        "name": "Cassandra Ong",
+        "cafesId": 1,
+        "days": 7,
+        "email": "cass.ong@prisma.io",
+        "phone": "+6588888888",
+        "gender": "F"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Farm Cafe",
+    "createdAt": "2024-09-19T21:26:04.957Z",
+    "updatedAt": "2024-09-19T21:26:04.957Z",
+    "description": "Lorem ipsum dolor sit amet",
+    "logo": "https://gravatar.com/avatar/24f7432224dd89ca643bec40d21861a7?s=400&d=robohash&r=x",
+    "location": "Jurong",
+    "employees": [
+      {
+        "id": 4,
+        "createdAt": "2024-09-19T21:26:05.011Z",
+        "updatedAt": "2024-09-19T21:26:05.011Z",
+        "name": "Monkey D. Luffy",
+        "cafesId": 2,
+        "days": 7,
+        "email": "1piece@prisma.io",
+        "phone": "+6588888888",
+        "gender": "M"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Pogo Cafe",
+    "createdAt": "2024-09-19T21:26:04.966Z",
+    "updatedAt": "2024-09-19T21:26:04.966Z",
+    "description": "Lorem ipsum dolor sit amet",
+    "logo": "https://gravatar.com/avatar/1db0c9ee9a6da87ee2416ea23dfab10d?s=400&d=robohash&r=x",
+    "location": "Raffles",
+    "employees": [
+      {
+        "id": 3,
+        "createdAt": "2024-09-19T21:26:05.002Z",
+        "updatedAt": "2024-09-19T21:26:05.002Z",
+        "name": "Bratanila SD",
+        "cafesId": 3,
+        "days": 365,
+        "email": "sd@prisma.io",
+        "phone": "+6588888888",
+        "gender": "F"
+      }
+    ]
+  }
+]
 ```
 
-Response
-```json
-{
-  "id": 3,
-  "name": "Cafe2",
-  "description": "Some desc",
-  "employees": 2,
-  "logo": "somelogo.png",
-  "location": "sg"
-}
-```
 ----
-**Create Employees**
-<img src="screenshots/employee.png" />
 
-Request:
+### Employees (http://localhost:8888/employees)
+
 ```json
-{
-  "name": "Employee1",
-  "email_address": "test@test.com",
-  "phone_number": "+658888888",
-  "days_worked":   1,
-  "cafe": "Cafe1"
-}
-
-```
-
-Response
-```json
-{
-  "id": 1,
-  "name": "Employee1",
-  "email_address": "test@test.com",
-  "phone_number": "+658888888",
-  "days_worked": 1,
-  "cafe": "Cafe1"
-}
+[
+  {
+    "id": 1,
+    "createdAt": "2024-09-19T21:26:04.975Z",
+    "updatedAt": "2024-09-19T21:26:04.975Z",
+    "name": "Alice Guo",
+    "cafesId": 1,
+    "days": 7,
+    "email": "alice.guo@prisma.io",
+    "phone": "+6588888888",
+    "gender": "F",
+    "cafe": {
+      "id": 1,
+      "name": "Digong Cafe",
+      "createdAt": "2024-09-19T21:26:04.929Z",
+      "updatedAt": "2024-09-19T21:26:04.929Z",
+      "description": "Lorem ipsum dolor sit amet",
+      "logo": "https://gravatar.com/avatar/ef7b90c86c01dea8b4313dbb1cd0d015?s=400&d=robohash&r=x",
+      "location": "Tampines"
+    }
+  },
+  {
+    "id": 2,
+    "createdAt": "2024-09-19T21:26:04.992Z",
+    "updatedAt": "2024-09-19T21:26:04.992Z",
+    "name": "Cassandra Ong",
+    "cafesId": 1,
+    "days": 7,
+    "email": "cass.ong@prisma.io",
+    "phone": "+6588888888",
+    "gender": "F",
+    "cafe": {
+      "id": 1,
+      "name": "Digong Cafe",
+      "createdAt": "2024-09-19T21:26:04.929Z",
+      "updatedAt": "2024-09-19T21:26:04.929Z",
+      "description": "Lorem ipsum dolor sit amet",
+      "logo": "https://gravatar.com/avatar/ef7b90c86c01dea8b4313dbb1cd0d015?s=400&d=robohash&r=x",
+      "location": "Tampines"
+    }
+  },
+  {
+    "id": 3,
+    "createdAt": "2024-09-19T21:26:05.002Z",
+    "updatedAt": "2024-09-19T21:26:05.002Z",
+    "name": "Bratanila SD",
+    "cafesId": 3,
+    "days": 365,
+    "email": "sd@prisma.io",
+    "phone": "+6588888888",
+    "gender": "F",
+    "cafe": {
+      "id": 3,
+      "name": "Pogo Cafe",
+      "createdAt": "2024-09-19T21:26:04.966Z",
+      "updatedAt": "2024-09-19T21:26:04.966Z",
+      "description": "Lorem ipsum dolor sit amet",
+      "logo": "https://gravatar.com/avatar/1db0c9ee9a6da87ee2416ea23dfab10d?s=400&d=robohash&r=x",
+      "location": "Raffles"
+    }
+  },
+  {
+    "id": 4,
+    "createdAt": "2024-09-19T21:26:05.011Z",
+    "updatedAt": "2024-09-19T21:26:05.011Z",
+    "name": "Monkey D. Luffy",
+    "cafesId": 2,
+    "days": 7,
+    "email": "1piece@prisma.io",
+    "phone": "+6588888888",
+    "gender": "M",
+    "cafe": {
+      "id": 2,
+      "name": "Farm Cafe",
+      "createdAt": "2024-09-19T21:26:04.957Z",
+      "updatedAt": "2024-09-19T21:26:04.957Z",
+      "description": "Lorem ipsum dolor sit amet",
+      "logo": "https://gravatar.com/avatar/24f7432224dd89ca643bec40d21861a7?s=400&d=robohash&r=x",
+      "location": "Jurong"
+    }
+  }
+]
 ```
 
 
