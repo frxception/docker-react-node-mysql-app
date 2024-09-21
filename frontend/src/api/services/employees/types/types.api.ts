@@ -1,8 +1,7 @@
 import { CafeDataType } from '@/api/services';
 
 export type EmployeeDataType = {
-  // _id?: string;
-  id?: string;
+  id: string;
   createdAt: string;
   updatedAt: string;
   name: string;

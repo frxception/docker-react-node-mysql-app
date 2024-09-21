@@ -10,7 +10,8 @@ import Sidebar from './Sidebar.tsx';
 const LayoutComponent = () => {
   const [darkMode, setDarkMode] = useState(() => {
     const savedMode = localStorage.getItem('darkMode');
-    return savedMode ? JSON.parse(savedMode) : false;
+    if (savedMode === null) return true;
+    return savedMode ? JSON.parse(savedMode as string) : false;
   });
 
   useEffect(() => {

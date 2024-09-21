@@ -1,9 +1,9 @@
+import GroupedActionButtons from '@/components/buttons/GroupedActionButtons.tsx';
 import { Order } from '@/helpers/types/ui.types.ts';
 import { getFormattedDateTime } from '@/helpers/utils';
-import { isEmpty, omit } from 'lodash';
+import { omit } from 'lodash';
 import { FC, useMemo, useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import { FiEdit, FiTrash2 } from 'react-icons/fi';
 import {
   Avatar,
   Backdrop,
@@ -13,14 +13,6 @@ import {
   CardHeader,
   CircularProgress,
   IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-  TableSortLabel,
 } from '@mui/material';
 import { useModalStore } from '@/hooks';
 import {
@@ -33,7 +25,11 @@ import {
   useUpdateEmployeeMutation,
 } from '@/api/services/employees';
 import EmployeeModal, { EmployeeModalProps } from './EmployeeModal';
-import { useCafeListQuery } from '@/api/services';
+import { CafeDataType, useCafeListQuery } from '@/api/services';
+import SimpleDataTable, { Column } from '@/components/tables/SimpleDataTable';
+import EmployeeDetailsModal from '@/components/modals/EmployeeDetailsModal';
+import { motion, AnimatePresence } from 'framer-motion';
+import { LOADING_ANIMATION, TABLE_ANIMATION } from '@/configs/constant/ui.constants';
 
 const Employees: FC = () => {
   const isOpen = useModalStore((state) => state.isOpen);
@@ -53,6 +49,8 @@ const Employees: FC = () => {
 
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof EmployeeDataType>('name');
+
+  const [selectedEmployeeForDetails, setSelectedEmployeeForDetails] = useState<EmployeeDataType | null>(null);
 
   const handleRequestSort = (property: keyof EmployeeDataType) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -139,99 +137,50 @@ const Employees: FC = () => {
     open();
   };
 
-  const renderTable = () => {
-    if (!loadingFetch && isEmpty(sortedData)) {
-      return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-              <Typography>No data</Typography>
-            </Box>
-    }
-    return sortedData && (
-      <TableContainer sx={{ flexGrow: 1, height: '100%' }}>
-        <Table stickyHeader aria-label="employee table">
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'name'}
-                  direction={orderBy === 'name' ? order : 'asc'}
-                  onClick={() => handleRequestSort('name')}>
-                  Name
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'gender'}
-                  direction={orderBy === 'gender' ? order : 'asc'}
-                  onClick={() => handleRequestSort('gender')}>
-                  Gender
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Phone</TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'days'}
-                  direction={orderBy === 'days' ? order : 'asc'}
-                  onClick={() => handleRequestSort('days')}>
-                  Days
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'createdAt'}
-                  direction={orderBy === 'createdAt' ? order : 'asc'}
-                  onClick={() => handleRequestSort('createdAt')}>
-                  Added
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>Cafe</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {sortedData?.map((data) => (
-              <TableRow key={data?.id}>
-                <TableCell component="th" scope="row">
-                  {data?.id}
-                </TableCell>
-                <TableCell component="th" scope="row">
-                  {data?.name}
-                </TableCell>
-                <TableCell component="th" scope="row">
-                  {data?.gender?.toUpperCase() === 'M' ? 'Male' : 'Female'}
-                </TableCell>
-                <TableCell component="th" scope="row">
-                  {data?.email}
-                </TableCell>
-                <TableCell component="th" scope="row">
-                  {data?.phone}
-                </TableCell>
-                <TableCell component="th" scope="row">
-                  {data?.days}
-                </TableCell>
-                <TableCell component="th" scope="row">
-                  {getFormattedDateTime(data?.createdAt)}
-                </TableCell>
-                <TableCell component="th" scope="row">
-                  <Avatar src={data?.cafe?.logo} />
-                  {data?.cafe?.name}
-                </TableCell>
-                <TableCell align="left">
-                  <IconButton onClick={() => handleOpenEditModal(data)}>
-                    <FiEdit />
-                  </IconButton>
-                  <IconButton onClick={() => handleDelete(data)}>
-                    <FiTrash2 />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    );
-  }
+  const handleRowClick = (employee: EmployeeDataType) => {
+    setSelectedEmployeeForDetails(employee);
+  };
+
+  const handleCloseDetailsModal = () => {
+    setSelectedEmployeeForDetails(null);
+  };
+
+  const columns: Column<EmployeeDataType>[] = [
+    { id: 'id', label: 'ID' },
+    { id: 'name', label: 'Name', sortable: true },
+    {
+      id: 'gender',
+      label: 'Gender',
+      sortable: true,
+      render: (value) => ((value as string)?.toUpperCase() === 'M' ? 'Male' : 'Female'),
+    },
+    { id: 'email', label: 'Email' },
+    { id: 'phone', label: 'Phone' },
+    { id: 'days', label: 'Days', sortable: true },
+    {
+      id: 'createdAt',
+      label: 'Added',
+      sortable: true,
+      render: (value) => getFormattedDateTime(value as string),
+    },
+    {
+      id: 'cafe',
+      label: 'Cafe',
+      render: (value) => (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Avatar src={(value as CafeDataType)?.logo} />
+          {(value as CafeDataType)?.name}
+        </Box>
+      ),
+    },
+    {
+      id: 'actions' as keyof EmployeeDataType,
+      label: 'Actions',
+      render: (_, row) => (
+        <GroupedActionButtons onEdit={() => handleOpenEditModal(row)} onDelete={() => handleDelete(row)} />
+      ),
+    },
+  ];
 
   return (
     <Box
@@ -257,6 +206,12 @@ const Employees: FC = () => {
         cafes={cafes as unknown as EmployeeModalProps['cafes']}
       />
 
+      <EmployeeDetailsModal
+        isOpen={!!selectedEmployeeForDetails}
+        onClose={handleCloseDetailsModal}
+        employee={selectedEmployeeForDetails}
+      />
+
       <Card
         sx={{
           flexGrow: 1,
@@ -272,14 +227,64 @@ const Employees: FC = () => {
             </IconButton>
           }
         />
-        <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 0 }}>
-          {loadingFetch ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-              <CircularProgress />
-            </Box>
-          ) : renderTable() }
-        
-
+        <CardContent
+          sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 0, position: 'relative' }}>
+          <AnimatePresence mode="wait">
+            {loadingFetch ? (
+              <motion.div
+                key="loading"
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                variants={LOADING_ANIMATION}
+                transition={{ duration: 0.5 }}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  background: 'rgba(255, 255, 255, 0.8)',
+                }}>
+                <motion.div
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    rotate: [0, 360],
+                  }}
+                  transition={{
+                    duration: 2,
+                    ease: 'easeInOut',
+                    times: [0, 0.5, 1],
+                    repeat: Infinity,
+                  }}>
+                  <CircularProgress size={60} thickness={4} />
+                </motion.div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="content"
+                initial="hidden"
+                animate="show"
+                exit="hidden"
+                variants={TABLE_ANIMATION.tableContainerAnimation}
+                transition={{ duration: 0.5 }}
+                style={{ flex: 1 }}>
+                <SimpleDataTable
+                  data={sortedData}
+                  columns={columns}
+                  orderBy={orderBy}
+                  order={order}
+                  onRequestSort={handleRequestSort}
+                  emptyMessage="No employees found"
+                  onRowClick={handleRowClick}
+                  rowAnimation={TABLE_ANIMATION.rowAnimation}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </CardContent>
       </Card>
     </Box>

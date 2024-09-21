@@ -13,26 +13,26 @@ import { useModalStore } from '@/hooks';
 import AddIcon from '@mui/icons-material/Add';
 import {
   Backdrop,
-  Box, // Add this line
+  Box,
   Card,
   CardContent,
   CardHeader,
   CircularProgress,
   IconButton,
-  Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Avatar,
-  TableSortLabel,
+  Stack,
+  Chip,
 } from '@mui/material';
 import { isEmpty, sortBy } from 'lodash';
 import { useMemo, useState } from 'react';
-import { FiTrash2, FiEdit } from 'react-icons/fi';
+import { FiAlertTriangle } from 'react-icons/fi';
 import CafeModal from './CafeModal';
+import SimpleDataTable, { Column } from '@/components/tables/SimpleDataTable';
+import { Typography } from '@mui/material';
+import CafeDetailsModal from '@/components/modals/CafeDetailsModal';
+import { motion, AnimatePresence } from 'framer-motion';
+import { LOADING_ANIMATION, TABLE_ANIMATION } from '@/configs/constant/ui.constants';
+import GroupedActionButtons from '@/components/buttons/GroupedActionButtons';
 
 const Cafes = () => {
   const isOpen = useModalStore((state) => state.isOpen);
@@ -53,16 +53,13 @@ const Cafes = () => {
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof CafeDataType>('name');
 
+  const [selectedCafeForDetails, setSelectedCafeForDetails] = useState<CafeDataType | null>(null);
+
   const dataQueryList = useMemo(() => {
     if (queryData) {
       return sortBy(queryData as unknown as CafeResponseDataType['data'], ['name']);
     }
   }, [queryData]);
-
-  // const existingCafeNames = [];
-  //   useMemo(() => {
-  //   return dataQueryList ? dataQueryList.map((cafe: CafeDataType) => cafe.name) : [];
-  // }, [dataQueryList]);
 
   const handleCreateCafe = (body: CafeDataMutationType) => {
     return addCafe(body, {
@@ -120,12 +117,20 @@ const Cafes = () => {
     open();
   };
 
+  const handleRowClick = (cafe: CafeDataType) => {
+    setSelectedCafeForDetails(cafe);
+  };
+
+  const handleCloseDetailsModal = () => {
+    setSelectedCafeForDetails(null);
+  };
+
   const handleRequestSort = (property: keyof CafeDataType) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
-  
+
   const sortedData = useMemo(() => {
     if (dataQueryList) {
       return [...dataQueryList].sort((a, b) => {
@@ -153,91 +158,52 @@ const Cafes = () => {
     return [];
   }, [dataQueryList, order, orderBy]);
 
-  const renderTable = () => {
-    if (!loadingFetch && isEmpty(sortedData)) {
-      return (<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-        <Typography>No data</Typography>
-      </Box>);
-    }
-    return (
-      <TableContainer sx={{ flexGrow: 1, height: '100%' }}>
-        <Table stickyHeader aria-label="cafe table">
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'name'}
-                  direction={orderBy === 'name' ? order : 'asc'}
-                  onClick={() => handleRequestSort('name')}>
-                  Name
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'description'}
-                  direction={orderBy === 'description' ? order : 'asc'}
-                  onClick={() => handleRequestSort('description')}>
-                  Description
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>Employees</TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'location'}
-                  direction={orderBy === 'location' ? order : 'asc'}
-                  onClick={() => handleRequestSort('location')}>
-                  Location
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'updatedAt'}
-                  direction={orderBy === 'updatedAt' ? order : 'asc'}
-                  onClick={() => handleRequestSort('updatedAt')}>
-                  Update
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {sortedData.map((data, index) => (
-              <TableRow key={`${data?.id}-${index}`}>
-                <TableCell component="th" scope="row">
-                  {data?.id}
-                </TableCell>
-                <TableCell component="th" scope="row">
-                  <Avatar src={data.logo} />
-                  {data?.name}
-                </TableCell>
-                <TableCell component="th" scope="row">
-                  {data?.description}
-                </TableCell>
-                <TableCell component="th" scope="row">
-                  {data?.employees?.map((o, i) => <ol key={`${o?.id}-${i}`}>{`- ${o?.name}`}</ol>)}
-                </TableCell>
-                <TableCell component="th" scope="row">
-                  {data?.location}
-                </TableCell>
-                <TableCell component="th" scope="row">
-                  {getFormattedDateTime(data?.updatedAt)}
-                </TableCell>
-                <TableCell align="left">
-                  <IconButton onClick={() => handleOpenEditModal(data)}>
-                    <FiEdit />
-                  </IconButton>
-                  <IconButton onClick={() => handleDelete(data)}>
-                    <FiTrash2 />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
+  const columns: Column<CafeDataType>[] = [
+    { id: 'id', label: 'ID' },
+    {
+      id: 'name',
+      label: 'Name',
+      sortable: true,
+      render: (value, row) => (
+        <Stack direction="row" alignItems="center" gap={2}>
+          <Avatar src={row.logo} />
+          {value as string}
+        </Stack>
+      ),
+    },
+    { id: 'description', label: 'Description', sortable: true },
+    {
+      id: 'employees',
+      label: 'Employees',
+      render: (value) =>
+        isEmpty(value) ? (
+          <Stack direction="row" spacing={1}>
+            <FiAlertTriangle size={20} color="orange" />
+            <Typography fontSize={13}>No employees</Typography>
+          </Stack>
+        ) : (
+          <Stack direction="row" spacing={1}>
+            {(value as any[])?.map((o, i) => (
+              <Chip variant="outlined" key={`chip_${o?.id}-${i}`} label={o?.name} />
             ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    );
-  }
+          </Stack>
+        ),
+    },
+    { id: 'location', label: 'Location', sortable: true },
+    {
+      id: 'updatedAt',
+      label: 'Update',
+      sortable: true,
+      render: (value) => getFormattedDateTime(value as string),
+    },
+    {
+      id: 'actions' as keyof CafeDataType,
+      label: 'Actions',
+      render: (_, row) => (
+        <GroupedActionButtons onEdit={() => handleOpenEditModal(row)} onDelete={() => handleDelete(row)} />
+      ),
+    },
+  ];
 
   return (
     <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -256,6 +222,12 @@ const Cafes = () => {
         initialData={selectedCafe}
       />
 
+      <CafeDetailsModal
+        isOpen={!!selectedCafeForDetails}
+        onClose={handleCloseDetailsModal}
+        cafe={selectedCafeForDetails}
+      />
+
       <Card sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', width: '100%' }}>
         <CardHeader
           title="Cafe"
@@ -265,13 +237,64 @@ const Cafes = () => {
             </IconButton>
           }
         />
-        <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 0 }}>
-          {loadingFetch ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-              <CircularProgress />
-            </Box>
-          ) : renderTable()}
-          
+        <CardContent
+          sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 0, position: 'relative' }}>
+          <AnimatePresence mode="wait">
+            {loadingFetch ? (
+              <motion.div
+                key="loading"
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                variants={LOADING_ANIMATION}
+                transition={{ duration: 0.5 }}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  background: 'rgba(255, 255, 255, 0.8)',
+                }}>
+                <motion.div
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    rotate: [0, 360],
+                  }}
+                  transition={{
+                    duration: 2,
+                    ease: 'easeInOut',
+                    times: [0, 0.5, 1],
+                    repeat: Infinity,
+                  }}>
+                  <CircularProgress size={60} thickness={4} />
+                </motion.div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="content"
+                initial="hidden"
+                animate="show"
+                exit="hidden"
+                variants={TABLE_ANIMATION.tableContainerAnimation}
+                transition={{ duration: 0.5 }}
+                style={{ flex: 1, width: '100%' }}>
+                <SimpleDataTable
+                  data={sortedData}
+                  columns={columns}
+                  orderBy={orderBy}
+                  order={order}
+                  onRequestSort={handleRequestSort}
+                  emptyMessage="No cafes found"
+                  onRowClick={handleRowClick}
+                  rowAnimation={TABLE_ANIMATION.rowAnimation}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </CardContent>
       </Card>
     </Box>

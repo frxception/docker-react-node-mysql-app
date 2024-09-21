@@ -64,7 +64,7 @@ $ cd backend
 $ pnpm install
 
 # run mysql db server
-$ docker-compose up
+$ docker-compose up --build
 
 # run prisma migration
 $ npx prisma migrate dev

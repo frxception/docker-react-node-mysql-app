@@ -6,11 +6,6 @@ const Sidebar = () => {
   const router = useRouter();
   const theme = useTheme();
 
-  const isRouteActive = (path: string) => {
-    const currentPath = router.state.location.pathname;
-    return currentPath === path || (path !== '/' && currentPath.startsWith(path));
-  };
-
   return (
     <Drawer
       variant="permanent"
@@ -21,8 +16,6 @@ const Sidebar = () => {
       }}>
       <List>
         {routeList.map((route) => {
-          const isActive = isRouteActive(route.path);
-
           return (
             <Link
               key={route.path}
@@ -42,12 +35,7 @@ const Sidebar = () => {
                       },
                     },
                   }}>
-                  <ListItemIcon
-                    sx={{
-                      color: isActive ? theme.palette.primary.main : 'inherit',
-                    }}>
-                    {route.icon}
-                  </ListItemIcon>
+                  <ListItemIcon>{route.icon}</ListItemIcon>
                   <ListItemText primary={route.label} />
                 </ListItemButton>
               </ListItem>
