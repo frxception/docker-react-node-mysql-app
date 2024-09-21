@@ -11,6 +11,7 @@ This template provides a minimal setup to get React working in Vite with HMR and
 - 💎 Integrate with [Tailwind CSS](https://tailwindcss.com)
 - ✅ Strict Mode for TypeScript and React 18
 - 📏 Linter with [ESLint](https://eslint.org) (default NextJS, NextJS Core Web Vitals, Tailwind CSS and Airbnb configuration)
+- ⚡ [Zustand(https://Zustand.com/)
 - 💖 Code Formatter with [Prettier](https://prettier.io)
 - 🚫 Lint-staged for running linters on Git staged files
 
@@ -116,3 +117,14 @@ export default tseslint.config({
   },
 })
 ```
+
+------
+
+## Demo Preview
+
+![Screenshot 2024-09-21 at 15.20.20.png](screenshots/Screenshot%202024-09-21%20at%2015.20.20.png)
+![Screenshot 2024-09-21 at 16.21.05.png](screenshots/Screenshot%202024-09-21%20at%2016.21.05.png)
+![Screenshot 2024-09-21 at 16.21.11.png](screenshots/Screenshot%202024-09-21%20at%2016.21.11.png)
+![Screenshot 2024-09-21 at 16.21.19.png](screenshots/Screenshot%202024-09-21%20at%2016.21.19.png)
+![Screenshot 2024-09-21 at 16.21.26.png](screenshots/Screenshot%202024-09-21%20at%2016.21.26.png)
+![Screenshot 2024-09-21 at 16.21.34.png](screenshots/Screenshot%202024-09-21%20at%2016.21.34.png)

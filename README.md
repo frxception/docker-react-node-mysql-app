@@ -143,12 +143,3 @@ To know check out the guideline [Read more](./frontend/README.md)
 
 
 ----
-
-### DEMO  
-![Screenshot 2024-09-20 at 05.27.53.png](screenshots/Screenshot%202024-09-20%20at%2005.27.53.png)
-![Screenshot 2024-09-20 at 05.28.07.png](screenshots/Screenshot%202024-09-20%20at%2005.28.07.png)
-![Screenshot 2024-09-20 at 05.28.14.png](screenshots/Screenshot%202024-09-20%20at%2005.28.14.png)
-![Screenshot 2024-09-20 at 05.28.27.png](screenshots/Screenshot%202024-09-20%20at%2005.28.27.png)
-![Screenshot 2024-09-20 at 05.28.38.png](screenshots/Screenshot%202024-09-20%20at%2005.28.38.png)
-![Screenshot 2024-09-20 at 05.28.46.png](screenshots/Screenshot%202024-09-20%20at%2005.28.46.png)
-![Screenshot 2024-09-20 at 05.28.53.png](screenshots/Screenshot%202024-09-20%20at%2005.28.53.png)
