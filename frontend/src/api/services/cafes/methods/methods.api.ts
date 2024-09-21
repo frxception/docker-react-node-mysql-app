@@ -1,6 +1,7 @@
+import { omit } from 'lodash';
+
 import axiosClient from '@/api/clients/axios-client.ts';
 import { ResponseDataType, CafeDataType, CafeDataMutationType } from '@/api/services';
-import { omit } from 'lodash';
 
 const baseUrl = 'cafes';
 

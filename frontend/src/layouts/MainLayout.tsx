@@ -1,10 +1,12 @@
 import React from 'react';
-import { Outlet } from '@tanstack/react-router';
-import Sidebar from './Sidebar';
-import { AppBar, Box, IconButton, Toolbar, Typography, useTheme } from '@mui/material';
+
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
+import { AppBar, Box, IconButton, Toolbar, Typography, useTheme } from '@mui/material';
+import { Outlet } from '@tanstack/react-router';
 import { motion, AnimatePresence } from 'framer-motion';
+
+import Sidebar from './Sidebar';
 import PageTransition from '@/components/PageTransition';
 import { useColorMode } from '@/hooks/useColorMode';
 

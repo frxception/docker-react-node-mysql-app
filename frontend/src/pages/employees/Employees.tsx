@@ -1,8 +1,5 @@
-import GroupedActionButtons from '@/components/buttons/GroupedActionButtons.tsx';
-import { Order } from '@/helpers/types/ui.types.ts';
-import { getFormattedDateTime } from '@/helpers/utils';
-import { omit } from 'lodash';
 import { FC, useMemo, useState } from 'react';
+
 import AddIcon from '@mui/icons-material/Add';
 import {
   Avatar,
@@ -14,7 +11,11 @@ import {
   CircularProgress,
   IconButton,
 } from '@mui/material';
-import { useModalStore } from '@/hooks';
+import { motion, AnimatePresence } from 'framer-motion';
+import { omit } from 'lodash';
+
+import EmployeeModal, { EmployeeModalProps } from './EmployeeModal';
+import { CafeDataType, useCafeListQuery } from '@/api/services';
 import {
   EmployeeDataMutationType,
   EmployeeDataType,
@@ -24,12 +25,13 @@ import {
   useEmployeeListQuery,
   useUpdateEmployeeMutation,
 } from '@/api/services/employees';
-import EmployeeModal, { EmployeeModalProps } from './EmployeeModal';
-import { CafeDataType, useCafeListQuery } from '@/api/services';
-import SimpleDataTable, { Column } from '@/components/tables/SimpleDataTable';
+import GroupedActionButtons from '@/components/buttons/GroupedActionButtons.tsx';
 import EmployeeDetailsModal from '@/components/modals/EmployeeDetailsModal';
-import { motion, AnimatePresence } from 'framer-motion';
+import SimpleDataTable, { Column } from '@/components/tables/SimpleDataTable';
 import { LOADING_ANIMATION, TABLE_ANIMATION } from '@/configs/constant/ui.constants';
+import { Order } from '@/helpers/types/ui.types.ts';
+import { getFormattedDateTime } from '@/helpers/utils';
+import { useModalStore } from '@/hooks';
 
 const Employees: FC = () => {
   const isOpen = useModalStore((state) => state.isOpen);
@@ -113,7 +115,7 @@ const Employees: FC = () => {
 
   const handleDelete = (e: EmployeeDataType) => {
     if (window.confirm(`Are you sure you want to delete "${e.name}"?`)) {
-      handleDeleteEmployee(e.id as string);
+      handleDeleteEmployee(e.id);
     }
   };
 

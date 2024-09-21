@@ -1,5 +1,6 @@
 import CoffeeIcon from '@mui/icons-material/Coffee';
 import PeopleIcon from '@mui/icons-material/People';
+
 import { HOME_PATH, EMPLOYEES_PATH } from '@/configs';
 import Cafes from '@/pages/cafes/Cafes';
 import Employees from '@/pages/employees/Employees';

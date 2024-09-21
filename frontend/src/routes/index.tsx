@@ -1,9 +1,10 @@
 import { Router, Route, RootRoute } from '@tanstack/react-router';
+
+import { HOME_PATH, EMPLOYEES_PATH } from '@/configs';
 import LayoutComponent from '@/layouts';
 import Cafes from '@/pages/cafes/Cafes';
 import Employees from '@/pages/employees/Employees';
 import NotFound from '@/pages/not-found/NotFound';
-import { HOME_PATH, EMPLOYEES_PATH } from '@/configs';
 
 const rootRoute = new RootRoute({
   component: LayoutComponent,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+
 import {
   Box,
   Table,
@@ -11,6 +11,8 @@ import {
   TableSortLabel,
   Typography,
 } from '@mui/material';
+import { motion } from 'framer-motion';
+
 import { Order } from '@/helpers/types/ui.types';
 
 export type Column<T> = {

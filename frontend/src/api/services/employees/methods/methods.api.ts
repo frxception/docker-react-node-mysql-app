@@ -1,7 +1,8 @@
+import { omit } from 'lodash';
+
 import axiosClient from '@/api/clients/axios-client.ts';
 import { ResponseDataType } from '@/api/services';
 import { EmployeeDataType, EmployeeDataMutationType } from '@/api/services/employees';
-import { omit } from 'lodash';
 
 const baseUrl = 'Employees';
 

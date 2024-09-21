@@ -1,5 +1,6 @@
-import { Link, useRouter } from '@tanstack/react-router';
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, useTheme } from '@mui/material';
+import { Link, useRouter } from '@tanstack/react-router';
+
 import { routeList } from '@/configs/constant/navigation.constants';
 
 const Sidebar = () => {
@@ -23,7 +24,7 @@ const Sidebar = () => {
               style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
               onClick={(event) => {
                 event.preventDefault();
-                router.navigate({ to: route.path });
+                void router.navigate({ to: route.path });
               }}>
               <ListItem disablePadding>
                 <ListItemButton

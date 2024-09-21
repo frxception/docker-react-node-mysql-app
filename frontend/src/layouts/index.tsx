@@ -1,8 +1,10 @@
 import { Suspense, useState, useEffect } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
-import { Outlet } from '@tanstack/react-router';
+
 import { Box, CssBaseline, ThemeProvider } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
+import { Outlet } from '@tanstack/react-router';
+import { ErrorBoundary } from 'react-error-boundary';
+
 import errorBoundary from './ErrorBoundary.tsx';
 import Header from './Header.tsx';
 import Sidebar from './Sidebar.tsx';
@@ -11,7 +13,7 @@ const LayoutComponent = () => {
   const [darkMode, setDarkMode] = useState(() => {
     const savedMode = localStorage.getItem('darkMode');
     if (savedMode === null) return true;
-    return savedMode ? JSON.parse(savedMode as string) : false;
+    return savedMode ? JSON.parse(savedMode) : false;
   });
 
   useEffect(() => {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+
 import {
   Modal,
   Box,
@@ -21,6 +21,8 @@ import {
   FormControlLabel,
   FormLabel,
 } from '@mui/material';
+import { useForm, Controller } from 'react-hook-form';
+
 import { EmployeeDataMutationType } from '@/api/services/employees';
 
 type Input = {
