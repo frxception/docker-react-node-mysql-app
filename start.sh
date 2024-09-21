@@ -25,3 +25,14 @@ echo "===========[ Run prisma migrate in backend...] ============ ${pwd}"
 npx prisma migrate dev
 
 echo "===========[ Setup complete! ] ============"
+
+
+echo "To test backend API service endpoint: "
+echo "http: //localhost:8888/"
+
+echo "---------------"
+
+echo "To view frontend app open browser:"
+echo "http: //localhost:8080"
+
+
