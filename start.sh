@@ -17,9 +17,10 @@ pwd
 docker-compose up --build -d
 
 # Navigate back to backend directory and run Prisma migrations
-echo "===========[ Run prisma migrate in backend...] ============"
 cd backend
-pwd
+echo "===========[ Have some tea first...] ============ ${pwd}"
+./waitForIt.sh --host=db --port=3306 --strict --timeout=30
+echo "===========[ Run prisma migrate in backend...] ============ ${pwd}"
 # npx prisma db seed
 npx prisma migrate dev
 

@@ -27,11 +27,16 @@ RUN chmod +x migratePrisma.sh
 # RUN pnpm run build
 EXPOSE $NODE_DOCKER_PORT
 
-CMD ["./waitForIt.sh", "db:3306", "--", "./migratePrisma.sh"]
+CMD ["./waitForIt.sh", "--host=db", "--port=3306"]
 
-RUN echo "Running nginx server ===  $(pwd)"
+RUN echo "Running prisma migration ===  $(pwd)"
+
+#CMD ["./migratePrisma.sh"]
 
 CMD ["npx","prisma", "migrate", "dev"]
+
+RUN echo "Running backend server ===  $(pwd)"
+
 CMD ["pnpm", "run", "start"]
 
 #CMD ["node","dist/main.js"]
