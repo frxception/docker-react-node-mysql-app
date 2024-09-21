@@ -25,6 +25,6 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src", "tsconfig.json"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/router.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

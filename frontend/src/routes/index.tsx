@@ -37,9 +37,3 @@ const notFoundRoute = new Route({
 const routeTree = rootRoute.addChildren([indexRoute, cafesRoute, employeesRoute, notFoundRoute]);
 
 export const router = new Router({ routeTree });
-
-declare module '@tanstack/react-router' {
-  interface Register {
-    router: typeof router;
-  }
-}
