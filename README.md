@@ -48,6 +48,20 @@ $ ./start.sh
 $ ./stop.sh
 ```
 
+#### Clean docker env
+Incase if you encounter any issue in the servers you can run the clean script to clean all docker containers and db.
+```bash
+$ ./clean.sh
+```
+> NOTE: In some cases that some containers are not cleaned/removed you need to restart, stopped or kill your docker process in your system or manually remove those images/containers.
+
+
+#### Database seeeding
+Incase if you add and seed the database you run this script only if mysql db server (or after the exeucution of ./start.sh) is up and running
+```bash
+$ ./seed.sh
+```
+
 <br>
 
 
@@ -120,7 +134,7 @@ $ npx prisma generate
 ```bash
 # Docker commands
 $ docker ps -a
-$ docker system prune -a
+$ docker container prune
 $ docker ps -a
 $ docker rm <id>
 
