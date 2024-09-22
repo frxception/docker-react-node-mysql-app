@@ -56,11 +56,14 @@ $ ./clean.sh
 > NOTE: In some cases that some containers are not cleaned/removed you need to restart, stopped or kill your docker process in your system or manually remove those images/containers.
 
 
-#### Database seeeding
-Incase if you add and seed the database you run this script only if mysql db server (or after the exeucution of ./start.sh) is up and running
+#### Seeding
+Incase if you add and seed the database you run this script only if mysql db server (or after the exeucution of ./start.sh) is up and running.
+
 ```bash
 $ ./seed.sh
 ```
+> NOTE: Its important to remember that if you already have an existing data that have the same ID's from the seed data, the seeding will fail.  Unless the existing data is delete or removed.
+
 
 <br>
 

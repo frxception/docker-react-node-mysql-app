@@ -5,8 +5,8 @@ echo "===========[ Run backend seeding...] ============ ${pwd}"
 # Navigate back to backend directory and run Prisma migrations
 cd backend
 
-echo "===========[ Clean all existing backend dbdata...] ============ ${pwd}"
-rm -rf  dbdata
+#echo "===========[ Clean all existing backend dbdata...] ============ ${pwd}"
+#rm -rf  dbdata
 
 
 echo "===========[ Run prisma migrate ...] ============ ${pwd}"
